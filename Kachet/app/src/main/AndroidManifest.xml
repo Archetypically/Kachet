@@ -17,7 +17,7 @@
         <!-- API Key needed to access google play services -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=" AIzaSyAJtfiFkGYnVlAatuMxZTCFASo4EkVYNUQ" />
+            android:value="@string/google_maps_keys" />
 
         <activity android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
