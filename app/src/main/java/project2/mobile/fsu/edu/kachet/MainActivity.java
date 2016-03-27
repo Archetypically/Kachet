@@ -81,21 +81,22 @@ public class MainActivity extends AppCompatActivity
             Snackbar.make(mCoordLayout,
                     "You do not have the proper permission to access current location.",
                     Snackbar.LENGTH_INDEFINITE).show();
-
-
             return;
         }
         Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLocation != null) {
             currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
-            locMarker = gMap.addMarker(new MarkerOptions()
-                    .position(currLoc)
-                    .title("You!")
-                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("splash", 150, 150))));
-            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
-            gMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         }
+        else {
+            currLoc = new LatLng(30.4461, -84.2996);
+        }
+        locMarker = gMap.addMarker(new MarkerOptions()
+                .position(currLoc)
+                .title("You!")
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
+        gMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
     }
 
 
