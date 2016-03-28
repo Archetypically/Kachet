@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -14,15 +15,16 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     private ArrayList<KacheMessage> mMessages;
 
     private class KacheMessage {
-        public String msg;
-        public String usr;
-        public String date;
-        //private Image picture;
+        protected String msg;
+        protected String usr;
+        protected String date;
+        protected String picture;
 
-        public KacheMessage (String msg, String usr, String date){
+        public KacheMessage (String msg, String usr, String date, String img){
             this.msg = msg;
             this.usr = usr;
             this.date = date;
+            this.picture = img;
         }
     }
 
@@ -33,12 +35,14 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         TextView mMsgView;
         TextView mUsrView;
         TextView mDateView;
+        ImageView mPictureView;
 
         public ViewHolder(View v){
             super(v);
             mMsgView = (TextView) v.findViewById(R.id.message);
             mUsrView = (TextView) v.findViewById(R.id.name);
             mDateView = (TextView) v.findViewById(R.id.date);
+            mPictureView = (ImageView) v.findViewById(R.id.picture);
         }
     }
 
@@ -64,6 +68,10 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         holder.mMsgView.setText(tmp.msg);
         holder.mUsrView.setText(tmp.usr);
         holder.mDateView.setText(tmp.date);
+        if(tmp.picture == null)
+            holder.mPictureView.setImageResource(R.drawable.msg_default);
+        else
+            holder.mPictureView.setImageResource(R.drawable.img_default);
 
     }
 
@@ -78,8 +86,8 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     // you want to use the same images.
     private void initializeData(){
         mMessages = new ArrayList<>();
-        mMessages.add(new KacheMessage("Cool!", "Evan", "03/27/16"));
-        mMessages.add(new KacheMessage("Wow!", "Tyler", "03/27/16"));
-        mMessages.add(new KacheMessage("Amaz!", "BB", "03/27/16"));
+        mMessages.add(new KacheMessage("Cool!", "Evan", "03/27/16", null));
+        mMessages.add(new KacheMessage("Wow!", "Tyler", "03/27/16", null));
+        mMessages.add(new KacheMessage("Amaz!", "BB", "03/27/16", null));
     }
 }

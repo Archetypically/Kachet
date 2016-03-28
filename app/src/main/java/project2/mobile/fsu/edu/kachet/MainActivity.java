@@ -136,20 +136,41 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-        mGoogleApiClient.connect();
+
         super.onStart();
     }
 
     @Override
-    protected void onStop() {
+    protected void onResume(){
+        mGoogleApiClient.connect();
+        if(locMarker != null)
+            locMarker.setVisible(true);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause(){
+        if(locMarker != null)
+            locMarker.setVisible(false);
         mGoogleApiClient.disconnect();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        locMarker.remove();
+        super.onDestroy();
     }
 
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        locMarker.setVisible(false);
     }
 
     @Override
@@ -181,9 +202,8 @@ public class MainActivity extends AppCompatActivity
                 kachePop.setAttachedInDecor(true);
                 kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
                 kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                kachePop.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
-                Log.i(TAG, "kachepop");
+                kachePop.setElevation(24);
+                kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
 
                 CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
                 Snackbar.make(mCoordLayout,
