@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     private HashMap<LatLng, Marker> kacheList;
     private static boolean inKache = false;
     protected PendingIntent mGeofencePendingIntent;
+    private static FloatingActionButton fab;
 
     //**************************************
     // Activity Lifecycle
@@ -91,6 +93,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         kacheList = new HashMap<>();
+        fab = (FloatingActionButton) findViewById(R.id.add_to_kache_button);
+        fab.hide();
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -270,6 +274,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+        gMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
 
@@ -355,10 +361,12 @@ public class MainActivity extends AppCompatActivity
 
     public static void setInKache() {
         inKache = true;
+        fab.show();
     }
 
     public static void setOutKache() {
         inKache = false;
+        fab.hide();
     }
 
     private void drawGeofenceBoundary(LatLng center){

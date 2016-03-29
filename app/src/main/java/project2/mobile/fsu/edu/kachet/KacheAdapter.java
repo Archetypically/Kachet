@@ -87,7 +87,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     private void initializeData(){
         mMessages = new ArrayList<>();
         mMessages.add(new KacheMessage("Cool!", "Evan", "03/27/16", null));
-        mMessages.add(new KacheMessage("Wow!", "Tyler", "03/27/16", null));
+        mMessages.add(new KacheMessage("Wow!", "Tyler", "03/27/16", "notnull"));
         mMessages.add(new KacheMessage("Amaz!", "BB", "03/27/16", null));
     }
 }

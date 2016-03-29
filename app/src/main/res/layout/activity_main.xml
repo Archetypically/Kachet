@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/coordLayout"
     tools:context="project2.mobile.fsu.edu.kachet.MainActivity">
 
@@ -11,4 +12,15 @@
         android:layout_height="fill_parent"
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/map" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_to_kache_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/add"
+        android:elevation="6dp"
+        app:layout_anchor="@id/map"
+        app:layout_anchorGravity="bottom|right|end"/>
 </android.support.design.widget.CoordinatorLayout>
