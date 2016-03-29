@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -36,6 +37,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -55,7 +57,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -97,7 +107,7 @@ public class MainActivity extends AppCompatActivity
     private LocationRequest mLocationRequest;
     private ArrayList<Geofence> mGeofenceList;
     private HashMap<LatLng, Marker> kacheList;
-    private static boolean inKache = false;
+    private static String inKache = null;
     protected PendingIntent mGeofencePendingIntent;
     private static FloatingActionButton fab;
     private FrameLayout mFrameLayout;
@@ -145,6 +155,8 @@ public class MainActivity extends AppCompatActivity
         LinearLayoutManager mRecyclerManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mRecyclerManager);
         mRecyclerView.setHasFixedSize(true);
+
+        // TODO: Move these lines in case of http requests
         mRecyclerAdapter = new KacheAdapter(null);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
@@ -299,7 +311,7 @@ public class MainActivity extends AppCompatActivity
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                if (inKache) {
+                if (inKache.equals(marker.getTitle())) {
                     kachePop.setTouchable(true);
                     kachePop.setOutsideTouchable(true);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -316,7 +328,8 @@ public class MainActivity extends AppCompatActivity
                     });
                     kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
                     mFrameLayout.getForeground().setAlpha(150);
-                } else {
+                }
+                else {
                     CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
                     Snackbar.make(mCoordLayout,
                             "You are not close enough to this kache!",
@@ -324,9 +337,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
-
-
         gMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
@@ -335,10 +345,58 @@ public class MainActivity extends AppCompatActivity
     // Helper Functions
     //**************************************
 
+    public void addToKache(View v){
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                HttpURLConnection urlConnection = null;
+                URL url = null;
+                InputStream inStream = null;
+                String response = null;
+                try {
+                    String parameters = "kache_id=3&message=fawefamwekflawmef";
+                    url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setDoInput(true);
+                    urlConnection.connect();
+                    OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
+                    request.write(parameters);
+                    request.flush();
+                    request.close();
+                    String line = "";
+                    InputStreamReader isr = new InputStreamReader(urlConnection.getInputStream());
+                    BufferedReader reader = new BufferedReader(isr);
+                    StringBuilder sb = new StringBuilder();
+                    while ((line = reader.readLine()) != null)
+                    {
+                        sb.append(line + "\n");
+                    }
+                    // Response from server after login process will be stored in response variable.
+                    response = sb.toString();
+                    // You can perform UI operations here
+                    Log.i("Message from Server", response);
+
+                    isr.close();
+                    reader.close();
+                }
+                catch (IOException ioe){
+                    ioe.printStackTrace();
+                }
+                finally {
+                    if(urlConnection != null)
+                        urlConnection.disconnect();
+                }
+            }
+        };
+        thread.start();
+    }
+
     private Marker addKachetoMap(LatLng coords){
         return gMap.addMarker(new MarkerOptions()
                 .position(coords)
-                .title("Kache")
+                .title("Kache " + String.valueOf(kacheList.size() + 1))
                 .snippet(String.valueOf(coords.latitude) + ", " + String.valueOf(coords.longitude))
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
     }
@@ -434,13 +492,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void setInKache() {
-        inKache = true;
+    public static void setInKache(String code) {
+        inKache = code;
         fab.show();
     }
 
-    public static void setOutKache() {
-        inKache = false;
+    public static void setOutKache(String code) {
+        inKache = null;
         fab.hide();
     }
 

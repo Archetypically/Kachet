@@ -28,6 +28,7 @@
             android:src="@drawable/add"
             android:elevation="6dp"
             app:layout_anchor="@id/map"
-            app:layout_anchorGravity="bottom|right|end"/>
+            app:layout_anchorGravity="bottom|right|end"
+            android:onClick="addToKache" />
     </android.support.design.widget.CoordinatorLayout>
 </FrameLayout>

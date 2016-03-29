@@ -7,6 +7,8 @@ import android.util.Log;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.util.List;
+
 public class KacheFencingService extends IntentService {
     private static final String TAG = "KacheFencingService";
 
@@ -25,11 +27,14 @@ public class KacheFencingService extends IntentService {
 
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
+        List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
-            MainActivity.setInKache();
+            if(!geofenceList.isEmpty())
+                MainActivity.setInKache(geofenceList.get(0).getRequestId());
         }
         else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT){
-            MainActivity.setOutKache();
+            if(!geofenceList.isEmpty())
+                MainActivity.setOutKache(geofenceList.get(0).getRequestId());
         }
         else {
             // Log the error.

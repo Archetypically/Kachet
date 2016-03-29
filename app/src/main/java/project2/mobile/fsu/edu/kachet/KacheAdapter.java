@@ -1,5 +1,6 @@
 package project2.mobile.fsu.edu.kachet;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,9 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> {
@@ -22,18 +28,17 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         protected String usr;
         protected String date;
         protected String picture;
+        protected int kacheId;
 
-        public KacheMessage (String msg, String usr, String date, String img){
+        public KacheMessage (String msg, String usr, String date, String img, int id){
             this.msg = msg;
             this.usr = usr;
             this.date = date;
             this.picture = img;
+            this.kacheId = id;
         }
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView mMsgView;
         TextView mUsrView;
@@ -49,13 +54,11 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
     public KacheAdapter(Bundle data) {
         Log.i("ADAPTER", "CONSTRUCTING");
         initializeData();
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public KacheAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View item = LayoutInflater.
@@ -85,16 +88,17 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         return mMessages.size();
     }
 
-    // This method creates an ArrayList that has three Person objects
-    // Checkout the project associated with this tutorial on Github if
-    // you want to use the same images.
-    private void initializeData(){
+    private void initializeData() {
         String date = new SimpleDateFormat("EEEE, MMMM d | hh:mm:ss z").format(new Date());
 
         mMessages = new ArrayList<>();
-        mMessages.add(new KacheMessage("Cool!", "Evan", date, null));
-        mMessages.add(new KacheMessage("Wow!", "Tyler", date, "notnull"));
-        mMessages.add(new KacheMessage("Amaz!", "BB", date, null));
-        mMessages.add(new KacheMessage("This is pretty cool, but I wish to stay anonymous!", null, date, null));
+        mMessages.add(
+                new KacheMessage("Cool!", "Evan", date, null, 1));
+        mMessages.add(
+                new KacheMessage("Wow!", "Tyler", date, "notnull", 1));
+        mMessages.add(
+                new KacheMessage("Amaz!", "BB", date, null, 1));
+        mMessages.add(
+                new KacheMessage("I wish to stay anonymous!", null, date, null, 1));
     }
 }
