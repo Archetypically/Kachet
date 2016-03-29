@@ -22,6 +22,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,9 +31,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -153,6 +157,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         mGoogleApiClient.connect();
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setTitle(R.string.main_title);
+        else if (getActionBar() != null)
+            getActionBar().setTitle(R.string.main_title);
         super.onResume();
     }
 
@@ -174,6 +182,23 @@ public class MainActivity extends AppCompatActivity
                 m.remove();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if(getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.main_title);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                }
+                onBackPressed();
+                kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
+                mFrameLayout.getForeground().setAlpha(150);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //**************************************
@@ -344,6 +369,29 @@ public class MainActivity extends AppCompatActivity
         // recreate the new Bitmap
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
         return resizedBitmap;
+    }
+
+    public void focusCard(View v){
+        String name = ((TextView) v.findViewById(R.id.name)).getText().toString();
+        String date = ((TextView) v.findViewById(R.id.date)).getText().toString();
+        String msg = ((TextView) v.findViewById(R.id.message)).getText().toString();
+
+        kachePop.dismiss();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        // For a little polish, specify a transition animation
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        // To make it fullscreen, use the 'content' root view as the container
+        // for the fragment, which is always the root view for the  activity
+        FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
+        transaction.add(android.R.id.content, mFocusFragment)
+                .addToBackStack(null).commit();
+
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(null);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     //**************************************

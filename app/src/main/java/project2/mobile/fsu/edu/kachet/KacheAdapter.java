@@ -89,7 +89,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     // Checkout the project associated with this tutorial on Github if
     // you want to use the same images.
     private void initializeData(){
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String date = new SimpleDateFormat("EEEE, MMMM d | hh:mm:ss z").format(new Date());
 
         mMessages = new ArrayList<>();
         mMessages.add(new KacheMessage("Cool!", "Evan", date, null));

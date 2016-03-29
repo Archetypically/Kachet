@@ -10,7 +10,8 @@
     android:layout_margin="5dp"
     android:padding="8dp"
     android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    android:onClick="focusCard">
 
     <RelativeLayout
         android:layout_width="match_parent"
