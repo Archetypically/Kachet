@@ -11,14 +11,11 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,6 +26,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.AutoTransition;
+import android.transition.ChangeBounds;
+import android.transition.ChangeTransform;
+import android.transition.TransitionSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,7 +38,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -62,20 +62,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
-/* TODO: make another FAB, one for submission, one for seeing kaches */
+// TODO: Hook up smaller FAB to the form layout
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -155,7 +150,6 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mRecyclerManager);
         mRecyclerView.setHasFixedSize(true);
 
-        // TODO: Move these lines in case of http requests
         mRecyclerAdapter = new KacheAdapter(null);
         mRecyclerView.setAdapter(mRecyclerAdapter);
     }
@@ -312,22 +306,7 @@ public class MainActivity extends AppCompatActivity
             public void onInfoWindowClick(Marker marker) {
                 if(inKache != null) {
                     if (inKache.equals(marker.getTitle())) {
-                        kachePop.setTouchable(true);
-                        kachePop.setOutsideTouchable(true);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                            kachePop.setAttachedInDecor(true);
-                            kachePop.setElevation(24);
-                        }
-                        kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
-                        kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                        kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                            @Override
-                            public void onDismiss() {
-                                mFrameLayout.getForeground().setAlpha(0);
-                            }
-                        });
-                        kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
-                        mFrameLayout.getForeground().setAlpha(150);
+                        showKachePopupWindow();
                     }
                 }
                 else {
@@ -341,9 +320,8 @@ public class MainActivity extends AppCompatActivity
         gMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
-
     //**************************************
-    // Helper Functions
+    // Kaching Functions
     //**************************************
 
     public void addToKache(View v){
@@ -399,6 +377,62 @@ public class MainActivity extends AppCompatActivity
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
     }
 
+    public void focusCard(View v){
+        String name = ((TextView) v.findViewById(R.id.name)).getText().toString();
+        String date = ((TextView) v.findViewById(R.id.date)).getText().toString();
+        String msg = ((TextView) v.findViewById(R.id.message)).getText().toString();
+
+        kachePop.dismiss();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
+
+/*        mFocusFragment.setSharedElementEnterTransition(new AutoTransition());
+        mFocusFragment.setEnterTransition(new AutoTransition());
+        mFocusFragment.setExitTransition(new AutoTransition());
+        mFocusFragment.setSharedElementReturnTransition(new AutoTransition());*/
+
+        transaction.add(android.R.id.content, mFocusFragment)
+                .addToBackStack(null).commit();
+
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(null);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    public void viewOwnKache (View v) {
+        // TODO: Change KacheAdapter to user's own data
+        showKachePopupWindow();
+    }
+
+    private void showKachePopupWindow(){
+        kachePop.setTouchable(true);
+        kachePop.setOutsideTouchable(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            kachePop.setAttachedInDecor(true);
+            kachePop.setElevation(24);
+        }
+        kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
+        kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                mFrameLayout.getForeground().setAlpha(0);
+            }
+        });
+        kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
+
+        mFrameLayout.getForeground().setAlpha(150);
+    }
+
+    //**************************************
+    // Helper Functions
+    //**************************************
+
     private void addMarkerFromCoordinates(double Lat, double Long, final String markerTitle) {
         LatLng newLocation = new LatLng(Lat, Long);
         Marker newMarker = gMap.addMarker(new MarkerOptions()
@@ -427,25 +461,7 @@ public class MainActivity extends AppCompatActivity
         return resizedBitmap;
     }
 
-    public void focusCard(View v){
-        String name = ((TextView) v.findViewById(R.id.name)).getText().toString();
-        String date = ((TextView) v.findViewById(R.id.date)).getText().toString();
-        String msg = ((TextView) v.findViewById(R.id.message)).getText().toString();
 
-        kachePop.dismiss();
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
-        transaction.add(android.R.id.content, mFocusFragment)
-                .addToBackStack(null).commit();
-
-        if(getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(null);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-    }
 
     //**************************************
     // Location Listener Interface Functions

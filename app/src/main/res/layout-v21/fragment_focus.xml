@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="project2.mobile.fsu.edu.kachet.FocusFragment"
-    android:background="@color/white">
+    android:background="@color/white"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,7 +34,8 @@
             android:textIsSelectable="false"
             android:layout_toRightOf="@+id/imageView"
             android:text="@string/anon"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:transitionName="focus"/>
 
     </RelativeLayout>
 

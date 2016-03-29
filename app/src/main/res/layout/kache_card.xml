@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="2dp"
+    card_view:cardElevation="6dp"
     android:layout_margin="5dp"
     android:padding="8dp"
     android:clickable="true"
@@ -41,7 +41,8 @@
                 android:textIsSelectable="false"
                 android:layout_alignTop="@+id/avatar"
                 android:layout_toRightOf="@+id/avatar"
-                android:text="@string/anon" />
+                android:text="@string/anon"
+                android:transitionName="focus"/>
 
             <TextView
                 android:layout_width="wrap_content"
