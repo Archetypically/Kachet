@@ -9,7 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> {
     private ArrayList<KacheMessage> mMessages;
@@ -66,7 +69,8 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         KacheMessage tmp = mMessages.get(pos);
 
         holder.mMsgView.setText(tmp.msg);
-        holder.mUsrView.setText(tmp.usr);
+        if(tmp.usr != null)
+            holder.mUsrView.setText(tmp.usr);
         holder.mDateView.setText(tmp.date);
         if(tmp.picture != null)
             holder.mPictureView.setImageResource(R.drawable.img_default);
@@ -85,9 +89,12 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     // Checkout the project associated with this tutorial on Github if
     // you want to use the same images.
     private void initializeData(){
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
         mMessages = new ArrayList<>();
-        mMessages.add(new KacheMessage("Cool!", "Evan", "03/27/16", null));
-        mMessages.add(new KacheMessage("Wow!", "Tyler", "03/27/16", "notnull"));
-        mMessages.add(new KacheMessage("Amaz!", "BB", "03/27/16", null));
+        mMessages.add(new KacheMessage("Cool!", "Evan", date, null));
+        mMessages.add(new KacheMessage("Wow!", "Tyler", date, "notnull"));
+        mMessages.add(new KacheMessage("Amaz!", "BB", date, null));
+        mMessages.add(new KacheMessage("This is pretty cool, but I wish to stay anonymous!", null, date, null));
     }
 }

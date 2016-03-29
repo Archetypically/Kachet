@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     private static boolean inKache = false;
     protected PendingIntent mGeofencePendingIntent;
     private static FloatingActionButton fab;
+    private FrameLayout mFrameLayout;
 
     //**************************************
     // Activity Lifecycle
@@ -95,6 +97,9 @@ public class MainActivity extends AppCompatActivity
         kacheList = new HashMap<>();
         fab = (FloatingActionButton) findViewById(R.id.add_to_kache_button);
         fab.hide();
+
+        mFrameLayout = (FrameLayout) findViewById(R.id.mFrame);
+        mFrameLayout.getForeground().setAlpha(0);
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -265,7 +270,14 @@ public class MainActivity extends AppCompatActivity
                     }
                     kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
                     kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                        @Override
+                        public void onDismiss() {
+                            mFrameLayout.getForeground().setAlpha(0);
+                        }
+                    });
                     kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
+                    mFrameLayout.getForeground().setAlpha(150);
                 } else {
                     CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
                     Snackbar.make(mCoordLayout,
@@ -274,6 +286,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+
 
         gMap.getUiSettings().setMapToolbarEnabled(false);
     }
