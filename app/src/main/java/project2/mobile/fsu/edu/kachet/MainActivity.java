@@ -53,6 +53,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+/* TODO: Change boolean inKache to possibly a Marker object, and then use onInfoWindowClickListener
+ to compare clicked marker to active kache */
+
 public class MainActivity extends AppCompatActivity
         implements
         OnMapReadyCallback,
@@ -128,23 +131,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         mGoogleApiClient.connect();
-        for(Marker m : kacheList.values()) {
-            if (m != null)
-                m.setVisible(true);
-        }
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LocationServices.GeofencingApi.removeGeofences(
-                mGoogleApiClient,
-                getGeofencePendingIntent()
-        ).setResultCallback(this); // Result processed in onResult().
-        for(Marker m : kacheList.values()) {
-            if (m != null)
-                m.setVisible(false);
-        }
         mGoogleApiClient.disconnect();
         super.onPause();
     }
@@ -195,11 +186,10 @@ public class MainActivity extends AppCompatActivity
         for(LatLng coords : kacheList.keySet()){
             drawGeofenceBoundary(coords);
         }
-
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setInterval(15000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setFastestInterval(10000);
+        mLocationRequest.setInterval(30000);
 
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
@@ -213,31 +203,31 @@ public class MainActivity extends AppCompatActivity
                             coords.longitude,
                             fenceRadius)
                     .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                    .setLoiteringDelay(3000)
+                    .setLoiteringDelay(5000)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL
                             | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build());
         }
-
-
 
         LocationServices.GeofencingApi.addGeofences(
                 mGoogleApiClient,
                 getGeofencingRequest(),
                 getGeofencePendingIntent()
         ).setResultCallback(this);
-
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
         gMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
-
     }
 
     @Override
     public void onConnectionSuspended(int i) {
         for(Marker m : kacheList.values())
-            m.setVisible(false);
+            m.remove();
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
+        LocationServices.GeofencingApi.removeGeofences(
+                mGoogleApiClient,
+                getGeofencePendingIntent()
+        ).setResultCallback(this); // Result processed in onResult().
     }
 
     @Override
