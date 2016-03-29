@@ -311,23 +311,25 @@ public class MainActivity extends AppCompatActivity
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                if (inKache.equals(marker.getTitle())) {
-                    kachePop.setTouchable(true);
-                    kachePop.setOutsideTouchable(true);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                        kachePop.setAttachedInDecor(true);
-                        kachePop.setElevation(24);
-                    }
-                    kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
-                    kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                    kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                        @Override
-                        public void onDismiss() {
-                            mFrameLayout.getForeground().setAlpha(0);
+                if(inKache != null) {
+                    if (inKache.equals(marker.getTitle())) {
+                        kachePop.setTouchable(true);
+                        kachePop.setOutsideTouchable(true);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                            kachePop.setAttachedInDecor(true);
+                            kachePop.setElevation(24);
                         }
-                    });
-                    kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
-                    mFrameLayout.getForeground().setAlpha(150);
+                        kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
+                        kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                        kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                            @Override
+                            public void onDismiss() {
+                                mFrameLayout.getForeground().setAlpha(0);
+                            }
+                        });
+                        kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
+                        mFrameLayout.getForeground().setAlpha(150);
+                    }
                 }
                 else {
                     CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
@@ -369,13 +371,10 @@ public class MainActivity extends AppCompatActivity
                     InputStreamReader isr = new InputStreamReader(urlConnection.getInputStream());
                     BufferedReader reader = new BufferedReader(isr);
                     StringBuilder sb = new StringBuilder();
-                    while ((line = reader.readLine()) != null)
-                    {
+                    while ((line = reader.readLine()) != null) {
                         sb.append(line + "\n");
                     }
-                    // Response from server after login process will be stored in response variable.
                     response = sb.toString();
-                    // You can perform UI operations here
                     Log.i("Message from Server", response);
 
                     isr.close();
@@ -438,10 +437,7 @@ public class MainActivity extends AppCompatActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        // For a little polish, specify a transition animation
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        // To make it fullscreen, use the 'content' root view as the container
-        // for the fragment, which is always the root view for the  activity
         FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
         transaction.add(android.R.id.content, mFocusFragment)
                 .addToBackStack(null).commit();

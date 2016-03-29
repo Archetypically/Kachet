@@ -26,11 +26,11 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     private class KacheMessage {
         protected String msg;
         protected String usr;
-        protected String date;
+        protected Date date;
         protected String picture;
         protected int kacheId;
 
-        public KacheMessage (String msg, String usr, String date, String img, int id){
+        public KacheMessage (String msg, String usr, Date date, String img, int id){
             this.msg = msg;
             this.usr = usr;
             this.date = date;
@@ -70,11 +70,12 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int pos) {
         KacheMessage tmp = mMessages.get(pos);
+        String date = new SimpleDateFormat("MM/dd/yy - hh:mm:ss a").format(tmp.date);
 
         holder.mMsgView.setText(tmp.msg);
         if(tmp.usr != null)
             holder.mUsrView.setText(tmp.usr);
-        holder.mDateView.setText(tmp.date);
+        holder.mDateView.setText(date);
         if(tmp.picture != null)
             holder.mPictureView.setImageResource(R.drawable.img_default);
         else
@@ -89,16 +90,16 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     }
 
     private void initializeData() {
-        String date = new SimpleDateFormat("EEEE, MMMM d | hh:mm:ss z").format(new Date());
+        Date dummy = new Date();
 
         mMessages = new ArrayList<>();
         mMessages.add(
-                new KacheMessage("Cool!", "Evan", date, null, 1));
+                new KacheMessage("Cool!", "Evan", dummy, null, 1));
         mMessages.add(
-                new KacheMessage("Wow!", "Tyler", date, "notnull", 1));
+                new KacheMessage("Wow!", "Tyler", dummy, "notnull", 1));
         mMessages.add(
-                new KacheMessage("Amaz!", "BB", date, null, 1));
+                new KacheMessage("Amaz!", "BB", dummy, null, 1));
         mMessages.add(
-                new KacheMessage("I wish to stay anonymous!", null, date, null, 1));
+                new KacheMessage("I wish to stay anonymous!", null, dummy, null, 1));
     }
 }
