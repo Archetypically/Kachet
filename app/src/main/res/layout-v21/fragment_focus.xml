@@ -34,8 +34,7 @@
             android:textIsSelectable="false"
             android:layout_toRightOf="@+id/imageView"
             android:text="@string/anon"
-            android:layout_centerVertical="true"
-            android:transitionName="focus"/>
+            android:layout_centerVertical="true" />
 
     </RelativeLayout>
 
@@ -65,6 +64,19 @@
         android:paddingTop="20dp"
         android:paddingBottom="24dp"
         android:text="Lorem ipsum" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TEST"
+        android:id="@+id/tester"
+        android:transitionName="focus"
+        android:textSize="14sp"
+        android:textIsSelectable="false"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="24dp"
+        android:paddingTop="20dp" />
 
     <TextView
         android:layout_width="match_parent"

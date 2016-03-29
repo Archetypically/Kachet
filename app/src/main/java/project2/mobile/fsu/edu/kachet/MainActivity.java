@@ -8,11 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -24,20 +21,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.transition.AutoTransition;
-import android.transition.ChangeBounds;
-import android.transition.ChangeTransform;
-import android.transition.TransitionSet;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -60,7 +47,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -94,10 +80,6 @@ public class MainActivity extends AppCompatActivity
     protected GoogleMap gMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLng currLoc;
-    private PopupWindow kachePop;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mRecyclerAdapter;
-    private View popupView;
     private LocationRequest mLocationRequest;
     private ArrayList<Geofence> mGeofenceList;
     private HashMap<LatLng, Marker> kacheList;
@@ -105,6 +87,8 @@ public class MainActivity extends AppCompatActivity
     protected PendingIntent mGeofencePendingIntent;
     private static FloatingActionButton fab;
     private FrameLayout mFrameLayout;
+    private FocusFragment mFocusFragment;
+    private KacheFragment mKacheFragment;
 
     //**************************************
     // Activity Lifecycle
@@ -133,25 +117,6 @@ public class MainActivity extends AppCompatActivity
         mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        Point size = new Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-
-        LayoutInflater layoutInflater = (LayoutInflater) getBaseContext()
-                .getSystemService(LAYOUT_INFLATER_SERVICE);
-        popupView = layoutInflater.inflate(R.layout.popup_kache, null);
-        kachePop = new PopupWindow(
-                popupView,
-                (int) (size.x * .8),
-                (int) (size.y * .6));
-
-        mRecyclerView = (RecyclerView) popupView.findViewById(R.id.kache_recycler);
-        LinearLayoutManager mRecyclerManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mRecyclerManager);
-        mRecyclerView.setHasFixedSize(true);
-
-        mRecyclerAdapter = new KacheAdapter(null);
-        mRecyclerView.setAdapter(mRecyclerAdapter);
     }
 
     @Override
@@ -193,13 +158,14 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if(getSupportActionBar() != null) {
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+                }
+                if(fm.getBackStackEntryCount() == 1 && getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.main_title);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 }
-                onBackPressed();
-                kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
-                mFrameLayout.getForeground().setAlpha(150);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -306,7 +272,7 @@ public class MainActivity extends AppCompatActivity
             public void onInfoWindowClick(Marker marker) {
                 if(inKache != null) {
                     if (inKache.equals(marker.getTitle())) {
-                        showKachePopupWindow();
+                        showKachePopup();
                     }
                 }
                 else {
@@ -329,12 +295,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 HttpURLConnection urlConnection = null;
-                URL url = null;
-                InputStream inStream = null;
-                String response = null;
                 try {
+                    String response;
                     String parameters = "kache_id=3&message=fawefamwekflawmef";
-                    url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
+                    URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
                     urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setRequestMethod("POST");
                     urlConnection.setDoOutput(true);
@@ -377,56 +341,21 @@ public class MainActivity extends AppCompatActivity
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
     }
 
-    public void focusCard(View v){
-        String name = ((TextView) v.findViewById(R.id.name)).getText().toString();
-        String date = ((TextView) v.findViewById(R.id.date)).getText().toString();
-        String msg = ((TextView) v.findViewById(R.id.message)).getText().toString();
+    public void viewOwnKache(View v) {
+        showKachePopup();
+    }
 
-        kachePop.dismiss();
-
+    private void showKachePopup(){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
-        FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
-
-/*        mFocusFragment.setSharedElementEnterTransition(new AutoTransition());
-        mFocusFragment.setEnterTransition(new AutoTransition());
-        mFocusFragment.setExitTransition(new AutoTransition());
-        mFocusFragment.setSharedElementReturnTransition(new AutoTransition());*/
-
-        transaction.add(android.R.id.content, mFocusFragment)
+        mKacheFragment = KacheFragment.newInstance();
+        transaction.add(android.R.id.content, mKacheFragment)
                 .addToBackStack(null).commit();
-
         if(getSupportActionBar() != null) {
             getSupportActionBar().setTitle(null);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    public void viewOwnKache (View v) {
-        // TODO: Change KacheAdapter to user's own data
-        showKachePopupWindow();
-    }
-
-    private void showKachePopupWindow(){
-        kachePop.setTouchable(true);
-        kachePop.setOutsideTouchable(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            kachePop.setAttachedInDecor(true);
-            kachePop.setElevation(24);
-        }
-        kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
-        kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        kachePop.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                mFrameLayout.getForeground().setAlpha(0);
-            }
-        });
-        kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
-
-        mFrameLayout.getForeground().setAlpha(150);
     }
 
     //**************************************
@@ -461,7 +390,10 @@ public class MainActivity extends AppCompatActivity
         return resizedBitmap;
     }
 
-
+    public void setActionBarTitle(String title){
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setTitle(title);
+    }
 
     //**************************************
     // Location Listener Interface Functions

@@ -1,7 +1,7 @@
 package project2.mobile.fsu.edu.kachet;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,17 +10,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> {
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    private OnItemClickListener mItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mItemClickListener = listener;
+    }
+
     private ArrayList<KacheMessage> mMessages;
 
     private class KacheMessage {
@@ -30,7 +33,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         protected String picture;
         protected int kacheId;
 
-        public KacheMessage (String msg, String usr, Date date, String img, int id){
+        public KacheMessage(String msg, String usr, Date date, String img, int id) {
             this.msg = msg;
             this.usr = usr;
             this.date = date;
@@ -44,6 +47,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         TextView mUsrView;
         TextView mDateView;
         ImageView mPictureView;
+        CardView mCardView;
 
         public ViewHolder(View v){
             super(v);
@@ -51,6 +55,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
             mUsrView = (TextView) v.findViewById(R.id.name);
             mDateView = (TextView) v.findViewById(R.id.date);
             mPictureView = (ImageView) v.findViewById(R.id.picture);
+            mCardView = (CardView) v.findViewById(R.id.card_view);
         }
     }
 
@@ -68,7 +73,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int pos) {
+    public void onBindViewHolder(ViewHolder holder, final int pos) {
         KacheMessage tmp = mMessages.get(pos);
         String date = new SimpleDateFormat("MM/dd/yy - hh:mm:ss a").format(tmp.date);
 
@@ -81,6 +86,15 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         else
             holder.mPictureView.setVisibility(View.GONE);
 
+        holder.mUsrView.setTransitionName("focus" + pos);
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(view, pos);
+                }
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)

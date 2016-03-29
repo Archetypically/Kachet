@@ -1,11 +1,7 @@
 package project2.mobile.fsu.edu.kachet;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +17,8 @@ public class FocusFragment extends DialogFragment {
     private String date;
     private String msg;
     private String pic;
+
+    private String tID;
 
     public FocusFragment() {
         // Required empty public constructor
@@ -49,28 +47,31 @@ public class FocusFragment extends DialogFragment {
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_focus, container, false);
+
+        TextView nameView = (TextView) v.findViewById(R.id.name);
         try {
-            ((TextView) v.findViewById(R.id.name)).setText(this.name);
+            (nameView).setText(this.name);
+            nameView.setTransitionName(tID);
             ((TextView) v.findViewById(R.id.message)).setText(this.msg);
             ((TextView) v.findViewById(R.id.date)).setText(this.date);
         }
         catch (NullPointerException npe){
             npe.printStackTrace();
         }
+
+
         return v;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-       // mListener = null;
+    public void setTid(String id){
+        this.tID = id;
     }
 }
