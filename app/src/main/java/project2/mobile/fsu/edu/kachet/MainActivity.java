@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity
         if (mLocation != null) {
             currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
         } else {
-            currLoc = new LatLng(30.4461, -81.2996);
+            currLoc = new LatLng(30.44611163, -84.29944217);
         }
 
         LatLng kache = new LatLng(30.44611163, -84.29944217);

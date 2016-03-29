@@ -68,10 +68,10 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         holder.mMsgView.setText(tmp.msg);
         holder.mUsrView.setText(tmp.usr);
         holder.mDateView.setText(tmp.date);
-        if(tmp.picture == null)
-            holder.mPictureView.setImageResource(R.drawable.msg_default);
-        else
+        if(tmp.picture != null)
             holder.mPictureView.setImageResource(R.drawable.img_default);
+        else
+            holder.mPictureView.setVisibility(View.GONE);
 
     }
 

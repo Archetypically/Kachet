@@ -7,47 +7,65 @@
     android:id="@+id/card_view"
     card_view:cardCornerRadius="4dp"
     android:elevation="2dp"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    android:padding="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_alignParentEnd="false"
+            android:id="@+id/titleArea">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/avatar"
+                android:src="@drawable/user" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textIsSelectable="false"
+                android:layout_alignTop="@+id/avatar"
+                android:layout_toRightOf="@+id/avatar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/date"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_alignLeft="@+id/name"
+                android:layout_below="@+id/name" />
+        </RelativeLayout>
+
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/picture"
-            android:layout_alignParentTop="true"
             android:contentDescription="Image of Kache"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:layout_below="@+id/titleArea" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/message"
-            android:textSize="20sp"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/picture"
-            android:layout_alignTop="@+id/picture"
-            android:padding="5dp" />
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:layout_below="@+id/picture" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/name"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:padding="5dp"
-            android:layout_alignBottom="@+id/picture"
-            android:layout_toRightOf="@+id/picture" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/date"
-            android:textSize="12sp"
-            android:layout_alignParentRight="true"
-            android:textStyle="italic"
-            android:padding="5dp"
-            android:layout_alignParentBottom="true" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
