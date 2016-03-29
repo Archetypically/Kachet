@@ -75,8 +75,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-/* TODO: Change boolean inKache to possibly a Marker object, and then use onInfoWindowClickListener
- to compare clicked marker to active kache */
+/* TODO: make another FAB, one for submission, one for seeing kaches */
 
 public class MainActivity extends AppCompatActivity
         implements
