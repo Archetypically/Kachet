@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Kachet</string>
     <string name="google_maps_keys">AIzaSyDg3PBnDZWti9010e8uDJW0Le7l3qjnnLQ</string>
+
+    <string name="google_app_id">934391912553</string>
 </resources>

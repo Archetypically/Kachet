@@ -1,6 +1,8 @@
 package project2.mobile.fsu.edu.kachet;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +11,10 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.location.LocationListener;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -21,38 +26,57 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity
         implements
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener,
+        ResultCallback {
 
     private final static String TAG = "MainActivity";
 
+    private final static int fenceRadius = 50;
     private MapFragment mapFragment;
     protected GoogleMap gMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLng currLoc;
-    private Marker locMarker;
     private PopupWindow kachePop;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mRecyclerAdapter;
     private View popupView;
+    private LocationRequest mLocationRequest;
+    private ArrayList<Geofence> mGeofenceList;
+    private HashMap<LatLng, Marker> kacheList;
+    private static boolean inKache = false;
+    protected PendingIntent mGeofencePendingIntent;
 
     //**************************************
     // Activity Lifecycle
@@ -63,10 +87,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Set up fragment
-        //TODO: I set up the fragment from the main activity rather internally from the fragment, if we want to do this differently we'll have to code this differently
+        kacheList = new HashMap<>();
 
-        // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -75,7 +97,6 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
-        //Get the map fragment and return the map (async)
         mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -83,15 +104,13 @@ public class MainActivity extends AppCompatActivity
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
 
-
-
-        LayoutInflater layoutInflater = (LayoutInflater)getBaseContext()
+        LayoutInflater layoutInflater = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         popupView = layoutInflater.inflate(R.layout.popup_kache, null);
         kachePop = new PopupWindow(
                 popupView,
-                (int)(size.x*.8),
-                (int)(size.y*.8));
+                (int) (size.x * .8),
+                (int) (size.y * .6));
 
         mRecyclerView = (RecyclerView) popupView.findViewById(R.id.kache_recycler);
         LinearLayoutManager mRecyclerManager = new LinearLayoutManager(this);
@@ -99,6 +118,49 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setHasFixedSize(true);
         mRecyclerAdapter = new KacheAdapter(null);
         mRecyclerView.setAdapter(mRecyclerAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        mGoogleApiClient.connect();
+        for(Marker m : kacheList.values()) {
+            if (m != null)
+                m.setVisible(true);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocationServices.GeofencingApi.removeGeofences(
+                mGoogleApiClient,
+                getGeofencePendingIntent()
+        ).setResultCallback(this); // Result processed in onResult().
+        for(Marker m : kacheList.values()) {
+            if (m != null)
+                m.setVisible(false);
+        }
+        mGoogleApiClient.disconnect();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        for(Marker m : kacheList.values()) {
+            if (m != null)
+                m.remove();
+        }
+        super.onDestroy();
     }
 
     //**************************************
@@ -121,56 +183,61 @@ public class MainActivity extends AppCompatActivity
                 mGoogleApiClient);
         if (mLocation != null) {
             currLoc = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+        } else {
+            currLoc = new LatLng(30.4461, -81.2996);
         }
-        else {
-            currLoc = new LatLng(30.4461, -84.2996);
+
+        LatLng kache = new LatLng(30.44611163, -84.29944217);
+        kacheList.put(kache, addKachetoMap(kache));
+        kache = new LatLng(30.43818458, -84.3043828);
+        kacheList.put(kache, addKachetoMap(kache));
+
+        for(LatLng coords : kacheList.keySet()){
+            drawGeofenceBoundary(coords);
         }
-        locMarker = gMap.addMarker(new MarkerOptions()
-                .position(currLoc)
-                .title("You!")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(15000);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+
+        mGeofenceList = new ArrayList<>();
+        for (LatLng coords : kacheList.keySet()){
+            mGeofenceList.add(new Geofence.Builder()
+                    .setRequestId(kacheList.get(coords).getTitle())
+                    .setCircularRegion(
+                            coords.latitude,
+                            coords.longitude,
+                            fenceRadius)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setLoiteringDelay(3000)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL
+                            | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build());
+        }
+
+
+
+        LocationServices.GeofencingApi.addGeofences(
+                mGoogleApiClient,
+                getGeofencingRequest(),
+                getGeofencePendingIntent()
+        ).setResultCallback(this);
+
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 5));
         gMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
+
     }
-
-
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume(){
-        mGoogleApiClient.connect();
-        if(locMarker != null)
-            locMarker.setVisible(true);
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause(){
-        if(locMarker != null)
-            locMarker.setVisible(false);
-        mGoogleApiClient.disconnect();
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        locMarker.remove();
-        super.onDestroy();
-    }
-
 
     @Override
     public void onConnectionSuspended(int i) {
-        locMarker.setVisible(false);
+        for(Marker m : kacheList.values())
+            m.setVisible(false);
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
     }
 
     @Override
@@ -195,20 +262,22 @@ public class MainActivity extends AppCompatActivity
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                // TODO: Implement proximity checking here
-
-                kachePop.setTouchable(true);
-                kachePop.setOutsideTouchable(true);
-                kachePop.setAttachedInDecor(true);
-                kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
-                kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                kachePop.setElevation(24);
-                kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
-
-                CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
-                Snackbar.make(mCoordLayout,
-                        "You are not close enough to this kache!",
-                        Snackbar.LENGTH_LONG);//.show();
+                if (inKache) {
+                    kachePop.setTouchable(true);
+                    kachePop.setOutsideTouchable(true);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        kachePop.setAttachedInDecor(true);
+                        kachePop.setElevation(24);
+                    }
+                    kachePop.setAnimationStyle(android.R.style.Animation_Dialog);
+                    kachePop.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                    kachePop.showAtLocation(popupView, Gravity.CENTER, 0, -10);
+                } else {
+                    CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
+                    Snackbar.make(mCoordLayout,
+                            "You are not close enough to this kache!",
+                            Snackbar.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -218,6 +287,13 @@ public class MainActivity extends AppCompatActivity
     // Helper Functions
     //**************************************
 
+    private Marker addKachetoMap(LatLng coords){
+        return gMap.addMarker(new MarkerOptions()
+                .position(coords)
+                .title("Kache")
+                .snippet(String.valueOf(coords.latitude) + ", " + String.valueOf(coords.longitude))
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+    }
 
     private void addMarkerFromCoordinates(double Lat, double Long, final String markerTitle) {
         LatLng newLocation = new LatLng(Lat, Long);
@@ -227,14 +303,13 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public Bitmap resizeMapIcons(String iconName,int width, int height){
+    public Bitmap resizeMapIcons(String iconName, int width, int height) {
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "mipmap", getPackageName()));
         //Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
         return getResizedBitmap(imageBitmap, height, width);
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth)
-    {
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
         int width = bm.getWidth();
         int height = bm.getHeight();
         float scaleWidth = ((float) newWidth) / width;
@@ -248,5 +323,60 @@ public class MainActivity extends AppCompatActivity
         return resizedBitmap;
     }
 
+    //**************************************
+    // Location Listener Interface Functions
+    //**************************************
 
+    @Override
+    public void onLocationChanged(Location location) {
+        // TODO: UPDATE CURRLOC IF NEEDED
+    }
+
+    //**************************************
+    // Geofencing Functions
+    //**************************************
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        builder.addGeofences(mGeofenceList);
+        return builder.build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, KacheFencingService.class);
+        return PendingIntent.getService(this, 0, intent, PendingIntent.
+                FLAG_UPDATE_CURRENT);
+    }
+
+    @Override
+    public void onResult(Result result) {
+        if (!result.getStatus().isSuccess()) {
+            Snackbar.make(
+                    (CoordinatorLayout) findViewById(R.id.coordLayout),
+                    "You do not have the correct location permissions to enable geofencing.",
+                    Snackbar.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    public static void setInKache() {
+        inKache = true;
+    }
+
+    public static void setOutKache() {
+        inKache = false;
+    }
+
+    private void drawGeofenceBoundary(LatLng center){
+        gMap.addCircle(new CircleOptions()
+                        .center(center)
+                        .radius(fenceRadius)
+                        .fillColor(Color.parseColor("#66FCE4EC"))
+                        .strokeColor(Color.parseColor("#99EC407A"))
+        );
+    }
 }
