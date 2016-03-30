@@ -50,7 +50,6 @@ public class KacheFragment extends Fragment {
                         .add(android.R.id.content, mFocusFragment)
                         .addToBackStack(null)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addSharedElement(nameText, nameText.getTransitionName())
                         .commit();
             }
         });
