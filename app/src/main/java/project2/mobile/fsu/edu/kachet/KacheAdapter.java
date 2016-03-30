@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> {
     public interface OnItemClickListener {
@@ -26,7 +27,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
 
     private ArrayList<KacheMessage> mMessages;
 
-    public class KacheMessage {
+    public static class KacheMessage {
         protected String msg;
         protected String usr;
         protected Date date;
@@ -75,11 +76,13 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int pos) {
         KacheMessage tmp = mMessages.get(pos);
-        String date = new SimpleDateFormat("MM/dd/yy - hh:mm:ss a").format(tmp.date);
+        String date = new SimpleDateFormat("MM/dd/yy - hh:mm:ss", Locale.US).format(tmp.date);
 
         holder.mMsgView.setText(tmp.msg);
         if(tmp.usr != null)
             holder.mUsrView.setText(tmp.usr);
+        else
+            holder.mUsrView.setText("Anonymous");
         holder.mDateView.setText(date);
         if(tmp.picture != null)
             holder.mPictureView.setImageResource(R.drawable.img_default);

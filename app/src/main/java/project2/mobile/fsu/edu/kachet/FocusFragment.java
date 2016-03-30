@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class FocusFragment extends DialogFragment {
     private static final String NAME_PARAM = "name";
     private static final String DATE_PARAM = "date";
@@ -22,11 +26,14 @@ public class FocusFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static FocusFragment newInstance(String name, String date, String msg, String pic) {
+    public static FocusFragment newInstance(String name, Date date, String msg, String pic) {
+        String ts = null;
+        if(date != null)
+             ts = new SimpleDateFormat("EEEE, MMMM dd, yyyy | hh:mm:ss", Locale.US).format(date);
         FocusFragment fragment = new FocusFragment();
         Bundle args = new Bundle();
         args.putString(NAME_PARAM, name);
-        args.putString(DATE_PARAM, date);
+        args.putString(DATE_PARAM, ts);
         args.putString(MSG_PARAM, msg);
         args.putString(PIC_PARAM, pic);
         fragment.setArguments(args);

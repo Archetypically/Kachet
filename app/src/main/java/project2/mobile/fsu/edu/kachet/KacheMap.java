@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.internal.ParcelableSparseArray;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -56,6 +57,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,6 +96,7 @@ public class KacheMap extends AppCompatActivity
     private FrameLayout mFrameLayout;
     private FocusFragment mFocusFragment;
     private KacheFragment mKacheFragment;
+    private static KacheAdapter mKacheAdapter;
 
     //**************************************
     // Activity Lifecycle
@@ -303,7 +306,7 @@ public class KacheMap extends AppCompatActivity
                 HttpURLConnection urlConnection = null;
                 try {
                     String response = "null";
-                    String parameters = "kache_id=3&message=fawefamwekflawmef";
+                    String parameters = "kache_id=2&message=Testing!";
                     URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
                     urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setRequestMethod("POST");
@@ -311,6 +314,7 @@ public class KacheMap extends AppCompatActivity
                     urlConnection.setDoInput(true);
                     urlConnection.connect();
                     OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
+                    request.write(parameters);
                     request.flush();
                     request.close();
                     String line = "";
@@ -352,7 +356,7 @@ public class KacheMap extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        mKacheFragment = KacheFragment.newInstance();
+        mKacheFragment = KacheFragment.newInstance(mKacheAdapter);
         transaction.add(android.R.id.content, mKacheFragment)
                 .addToBackStack(null).commit();
         if(getSupportActionBar() != null) {
@@ -441,11 +445,11 @@ public class KacheMap extends AppCompatActivity
         inKache = code;
         fab.show();
 
-        ArrayList<KacheAdapter.KacheMessage> messages
-                = new ArrayList<KacheAdapter.KacheMessage>();
         Thread thread = new Thread() {
             @Override
             public void run() {
+                ArrayList<KacheAdapter.KacheMessage> messages
+                        = new ArrayList<>();
                 HttpURLConnection urlConnection = null;
                 try {
                     String response = "";
@@ -469,17 +473,59 @@ public class KacheMap extends AppCompatActivity
 
                     response = response.substring(response.indexOf('"') + 1, response.lastIndexOf('"'));
 
-                    Log.i("JSON", response);
                     JSONArray msg = new JSONArray(response);
-                    Log.i("JSON OBJECT", msg.getJSONObject(0).getString("timestamp"));
+                    KacheAdapter.KacheMessage kMsg;
+                    JSONObject tmp;
+                    for(int i = 0; i < msg.length(); i++){
+                        tmp = msg.getJSONObject(i);
+
+                        Log.i("OBJ " + i, tmp.toString());
+
+                        String name = null;
+                        try{
+                            name = tmp.getString("name");
+                        }
+                        catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+                        String ts = null;
+                        try {
+                            ts = tmp.getString("timestamp");
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                        String message = null;
+                        try {
+                            message = tmp.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        Date date = null;
+                        if(ts != null) {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                            date = dateFormat.parse(ts);
+                        }
+
+                        kMsg = new KacheAdapter.KacheMessage(
+                                message,
+                                name,
+                                date,
+                                null,
+                                Character.getNumericValue(code.charAt(code.length() - 1)));
+
+                        messages.add(kMsg);
+                    }
 
                     in.close();
                     reader.close();
                 }
-                catch (IOException|JSONException e){
+                catch (IOException|ParseException|JSONException e){
                     e.printStackTrace();
                 }
                 finally {
+                    mKacheAdapter = new KacheAdapter(messages);
                     if(urlConnection != null)
                         urlConnection.disconnect();
                 }
