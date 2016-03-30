@@ -30,11 +30,11 @@ public class KacheFencingService extends IntentService {
         List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
             if(!geofenceList.isEmpty())
-                MainActivity.setInKache(geofenceList.get(0).getRequestId());
+                KacheMap.setInKache(geofenceList.get(0).getRequestId());
         }
         else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT){
             if(!geofenceList.isEmpty())
-                MainActivity.setOutKache(geofenceList.get(0).getRequestId());
+                KacheMap.setOutKache(geofenceList.get(0).getRequestId());
         }
         else {
             // Log the error.
