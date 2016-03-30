@@ -44,9 +44,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -291,12 +296,13 @@ public class KacheMap extends AppCompatActivity
     //**************************************
 
     public void addToKache(View v){
+
         Thread thread = new Thread() {
             @Override
             public void run() {
                 HttpURLConnection urlConnection = null;
                 try {
-                    String response;
+                    String response = "null";
                     String parameters = "kache_id=3&message=fawefamwekflawmef";
                     URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
                     urlConnection = (HttpURLConnection) url.openConnection();
@@ -305,20 +311,17 @@ public class KacheMap extends AppCompatActivity
                     urlConnection.setDoInput(true);
                     urlConnection.connect();
                     OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
-                    request.write(parameters);
                     request.flush();
                     request.close();
                     String line = "";
-                    InputStreamReader isr = new InputStreamReader(urlConnection.getInputStream());
-                    BufferedReader reader = new BufferedReader(isr);
-                    StringBuilder sb = new StringBuilder();
+                    InputStream in = urlConnection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     while ((line = reader.readLine()) != null) {
-                        sb.append(line + "\n");
+                        response += line + "\n";
                     }
-                    response = sb.toString();
                     Log.i("Message from Server", response);
 
-                    isr.close();
+                    in.close();
                     reader.close();
                 }
                 catch (IOException ioe){
@@ -434,9 +437,55 @@ public class KacheMap extends AppCompatActivity
         }
     }
 
-    public static void setInKache(String code) {
+    public static void setInKache(final String code) {
         inKache = code;
         fab.show();
+
+        ArrayList<KacheAdapter.KacheMessage> messages
+                = new ArrayList<KacheAdapter.KacheMessage>();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                HttpURLConnection urlConnection = null;
+                try {
+                    String response = "";
+                    URL url = new URL(
+                            "http://www.tylerhunnefeld.com/android/db_fetchKacheData.php?kache_id="
+                                    + String.valueOf(code.charAt(code.length() - 1)));
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setDoInput(true);
+                    urlConnection.connect();
+                    OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
+                    request.flush();
+                    request.close();
+                    String line = "";
+                    InputStream in = urlConnection.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    while ((line = reader.readLine()) != null) {
+                        response += line + "\n";
+                    }
+
+                    response = response.substring(response.indexOf('"') + 1, response.lastIndexOf('"'));
+
+                    Log.i("JSON", response);
+                    JSONArray msg = new JSONArray(response);
+                    Log.i("JSON OBJECT", msg.getJSONObject(0).getString("timestamp"));
+
+                    in.close();
+                    reader.close();
+                }
+                catch (IOException|JSONException e){
+                    e.printStackTrace();
+                }
+                finally {
+                    if(urlConnection != null)
+                        urlConnection.disconnect();
+                }
+            }
+        };
+        thread.start();
     }
 
     public static void setOutKache(String code) {

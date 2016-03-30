@@ -26,7 +26,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
 
     private ArrayList<KacheMessage> mMessages;
 
-    private class KacheMessage {
+    public class KacheMessage {
         protected String msg;
         protected String usr;
         protected Date date;
@@ -59,9 +59,9 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         }
     }
 
-    public KacheAdapter(Bundle data) {
-        Log.i("ADAPTER", "CONSTRUCTING");
-        initializeData();
+    public KacheAdapter(ArrayList<KacheMessage> messages) {
+        //initializeData();
+        mMessages = messages;
     }
 
     @Override
