@@ -5,7 +5,10 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +24,11 @@ public class FocusFragment extends DialogFragment {
     private String date;
     private String msg;
     private String pic;
+
+    private String nameTId;
+    private String dateTId;
+    private String avatarTId;
+    private String msgTId;
 
     public FocusFragment() {
         // Required empty public constructor
@@ -62,10 +70,18 @@ public class FocusFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.fragment_focus, container, false);
 
         TextView nameView = (TextView) v.findViewById(R.id.name);
+        TextView msgView = (TextView) v.findViewById(R.id.message);
+        TextView dateView =(TextView) v.findViewById(R.id.date);
+        ImageView avatarView = (ImageView) v.findViewById(R.id.avatar);
+
         try {
-            (nameView).setText(this.name);
-            ((TextView) v.findViewById(R.id.message)).setText(this.msg);
-            ((TextView) v.findViewById(R.id.date)).setText(this.date);
+            nameView.setText(this.name);
+            nameView.setTransitionName(nameTId);
+            msgView.setText(this.msg);
+            msgView.setTransitionName(msgTId);
+            dateView.setText(this.date);
+            dateView.setTransitionName(dateTId);
+            avatarView.setTransitionName(avatarTId);
         }
         catch (NullPointerException npe){
             npe.printStackTrace();
@@ -73,5 +89,21 @@ public class FocusFragment extends DialogFragment {
 
 
         return v;
+    }
+
+    public void setNameTId(String id){
+        this.nameTId = id;
+    }
+
+    public void setDateTId(String id){
+        this.dateTId = id;
+    }
+
+    public void setAvatarTId(String id){
+        this.avatarTId = id;
+    }
+
+    public void setMsgTId(String id){
+        this.msgTId = id;
     }
 }

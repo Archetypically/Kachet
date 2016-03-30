@@ -1,5 +1,6 @@
 package project2.mobile.fsu.edu.kachet;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,12 @@ import java.util.Date;
 import java.util.Locale;
 
 public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> {
+    public static final String name_t = "name_t";
+    public static final String date_t = "date_t";
+    public static final String msg_t = "msg_t";
+    public static final String av_t = "av_t";
+    public static final String pic_t = "pic_t";
+
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
     }
@@ -48,6 +55,7 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         TextView mUsrView;
         TextView mDateView;
         ImageView mPictureView;
+        ImageView mAvatarView;
         CardView mCardView;
 
         public ViewHolder(View v){
@@ -56,13 +64,15 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
             mUsrView = (TextView) v.findViewById(R.id.name);
             mDateView = (TextView) v.findViewById(R.id.date);
             mPictureView = (ImageView) v.findViewById(R.id.picture);
-            mCardView = (CardView) v.findViewById(R.id.card_view);
-        }
+            mAvatarView = (ImageView) v.findViewById(R.id.avatar);
+        mCardView = (CardView) v.findViewById(R.id.card_view);
     }
+}
 
     public KacheAdapter(ArrayList<KacheMessage> messages) {
         //initializeData();
         mMessages = messages;
+
     }
 
     @Override
@@ -78,18 +88,28 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         KacheMessage tmp = mMessages.get(pos);
         String date = new SimpleDateFormat("MM/dd/yy - hh:mm:ss", Locale.US).format(tmp.date);
 
-        holder.mMsgView.setText(tmp.msg);
-        if(tmp.usr != null)
-            holder.mUsrView.setText(tmp.usr);
-        else
+        if(tmp.usr == null || tmp.usr.equalsIgnoreCase(""))
             holder.mUsrView.setText("Anonymous");
+        else
+            holder.mUsrView.setText(tmp.usr);
+
+        holder.mUsrView.setTransitionName(name_t + pos);
+
+        holder.mMsgView.setText(tmp.msg);
+        holder.mMsgView.setTransitionName(msg_t + pos);
+
         holder.mDateView.setText(date);
-        if(tmp.picture != null)
+        holder.mDateView.setTransitionName(date_t + pos);
+
+        holder.mAvatarView.setTransitionName(av_t + pos);
+
+        if(tmp.picture != null) {
             holder.mPictureView.setImageResource(R.drawable.img_default);
+            holder.mPictureView.setTransitionName(pic_t + pos);
+        }
         else
             holder.mPictureView.setVisibility(View.GONE);
 
-        holder.mUsrView.setTransitionName("focus" + pos);
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
