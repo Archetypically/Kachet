@@ -46,21 +46,10 @@ public class KacheFragment extends Fragment {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 
                 FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
-                mFocusFragment.setTid(nameText.getTransitionName());
-/*                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    setSharedElementReturnTransition(TransitionInflater.from(
-                            getActivity()).inflateTransition(R.transition.focus_trans));
-                    setExitTransition(new Fade());
-
-                    mFocusFragment.setSharedElementEnterTransition(TransitionInflater.from(
-                            getActivity()).inflateTransition(R.transition.focus_trans));
-                    mFocusFragment.setEnterTransition(new Fade());
-                }*/
-
                 fragmentManager.beginTransaction()
                         .add(android.R.id.content, mFocusFragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addSharedElement(nameText, nameText.getTransitionName())
                         .commit();
             }

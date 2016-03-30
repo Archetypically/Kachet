@@ -18,8 +18,6 @@ public class FocusFragment extends DialogFragment {
     private String msg;
     private String pic;
 
-    private String tID;
-
     public FocusFragment() {
         // Required empty public constructor
     }
@@ -59,7 +57,6 @@ public class FocusFragment extends DialogFragment {
         TextView nameView = (TextView) v.findViewById(R.id.name);
         try {
             (nameView).setText(this.name);
-            nameView.setTransitionName(tID);
             ((TextView) v.findViewById(R.id.message)).setText(this.msg);
             ((TextView) v.findViewById(R.id.date)).setText(this.date);
         }
@@ -69,9 +66,5 @@ public class FocusFragment extends DialogFragment {
 
 
         return v;
-    }
-
-    public void setTid(String id){
-        this.tID = id;
     }
 }
