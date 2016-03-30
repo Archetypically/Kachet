@@ -108,7 +108,7 @@ public class KacheMap extends AppCompatActivity
         setContentView(R.layout.map_activity);
 
         kacheList = new HashMap<>();
-        fab = (FloatingActionButton) findViewById(R.id.add_to_kache_button);
+        fab = (FloatingActionButton) findViewById(R.id.view_kache);
         fab.hide();
 
         mFrameLayout = (FrameLayout) findViewById(R.id.mFrame);
@@ -298,8 +298,7 @@ public class KacheMap extends AppCompatActivity
     // Kaching Functions
     //**************************************
 
-    public void addToKache(View v){
-
+    public void addToKache(KacheAdapter.KacheMessage kMsg){
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -323,8 +322,6 @@ public class KacheMap extends AppCompatActivity
                     while ((line = reader.readLine()) != null) {
                         response += line + "\n";
                     }
-                    Log.i("Message from Server", response);
-
                     in.close();
                     reader.close();
                 }
@@ -348,7 +345,7 @@ public class KacheMap extends AppCompatActivity
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
     }
 
-    public void viewOwnKache(View v) {
+    public void viewKache(View v) {
         showKachePopup();
     }
 
@@ -507,17 +504,14 @@ public class KacheMap extends AppCompatActivity
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                             date = dateFormat.parse(ts);
                         }
-
                         kMsg = new KacheAdapter.KacheMessage(
                                 message,
                                 name,
                                 date,
                                 null,
                                 Character.getNumericValue(code.charAt(code.length() - 1)));
-
                         messages.add(kMsg);
                     }
-
                     in.close();
                     reader.close();
                 }
@@ -535,6 +529,7 @@ public class KacheMap extends AppCompatActivity
     }
 
     public static void setOutKache(String code) {
+        mKacheAdapter = null;
         inKache = null;
         fab.hide();
     }

@@ -20,35 +20,15 @@
             android:id="@+id/map" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/view_own_button"
+            android:id="@+id/view_kache"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
             android:layout_margin="16dp"
-            android:src="@drawable/add"
+            android:src="@drawable/see"
             android:elevation="6dp"
             app:layout_anchor="@id/map"
             app:layout_anchorGravity="bottom|right|end"
-            android:onClick="viewOwnKache" />
-
-        <View android:id="@+id/dummy"
-            android:layout_height="16dp"
-            android:layout_width="16dp"
-            app:layout_anchor="@id/view_own_button"
-            app:layout_anchorGravity="top|right"
-            android:layout_gravity="top" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add_to_kache_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:src="@drawable/add"
-            android:elevation="6dp"
-            app:layout_anchor="@+id/dummy"
-            app:layout_anchorGravity="top|center"
-            android:onClick="addToKache"
-            app:fabSize="mini"
-            app:backgroundTint="@color/white"/>
+            android:onClick="viewKache" />
     </android.support.design.widget.CoordinatorLayout>
 </FrameLayout>
