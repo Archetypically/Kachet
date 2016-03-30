@@ -367,7 +367,6 @@ public class MainActivity extends AppCompatActivity
         Marker newMarker = gMap.addMarker(new MarkerOptions()
                 .position(newLocation)
                 .title(markerTitle));
-
     }
 
     public Bitmap resizeMapIcons(String iconName, int width, int height) {

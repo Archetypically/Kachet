@@ -1,14 +1,11 @@
 package project2.mobile.fsu.edu.kachet;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +16,7 @@ public class KacheFragment extends Fragment {
     private KacheAdapter mKacheAdapter;
     private LinearLayoutManager mRecyclerManager;
 
-    public KacheFragment (){
+    public KacheFragment() {
         mKacheAdapter = new KacheAdapter(null);
         mRecyclerManager = new LinearLayoutManager(getContext());
     }
@@ -50,16 +47,19 @@ public class KacheFragment extends Fragment {
 
                 FocusFragment mFocusFragment = FocusFragment.newInstance(name, date, msg, null);
                 mFocusFragment.setTid(nameText.getTransitionName());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    setSharedElementReturnTransition(new Slide());
+/*                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    setSharedElementReturnTransition(TransitionInflater.from(
+                            getActivity()).inflateTransition(R.transition.focus_trans));
                     setExitTransition(new Fade());
 
-                    mFocusFragment.setSharedElementEnterTransition(new Explode());
+                    mFocusFragment.setSharedElementEnterTransition(TransitionInflater.from(
+                            getActivity()).inflateTransition(R.transition.focus_trans));
                     mFocusFragment.setEnterTransition(new Fade());
-                }
+                }*/
 
                 fragmentManager.beginTransaction()
                         .add(android.R.id.content, mFocusFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .addToBackStack(null)
                         .addSharedElement(nameText, nameText.getTransitionName())
                         .commit();
@@ -69,3 +69,4 @@ public class KacheFragment extends Fragment {
         return v;
     }
 }
+
