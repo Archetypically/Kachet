@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,7 +40,7 @@ public class PostKachet extends AppCompatActivity {
     private static final String MEDIA_FOLDER_NAME = "Kachet";
     private Uri currentMediaUri;
 
-    EditText message_text;
+    EditText message_text, name_text;
     ImageView view_image;
     FloatingActionButton camera, submit, reset;
 
@@ -50,6 +51,7 @@ public class PostKachet extends AppCompatActivity {
 
         message_text = (EditText) findViewById(R.id.message_body);
         view_image = (ImageView) findViewById(R.id.view_img);
+        name_text = (EditText) findViewById(R.id.name_text);
         submit = (FloatingActionButton) findViewById(R.id.checkmark_button);
         camera = (FloatingActionButton) findViewById(R.id.take_picture);
         reset = (FloatingActionButton) findViewById(R.id.x_button);
@@ -76,11 +78,15 @@ public class PostKachet extends AppCompatActivity {
                             Snackbar.LENGTH_LONG).show();
                 }
                 else{
-                    final String msg =
-                            ((TextView) v.findViewById(R.id.message_body)).getText().toString();
 
-                    final String name =
-                            ((TextView) v.findViewById(R.id.name_text)).getText().toString();
+                    final String msg =
+                            ((TextView) findViewById(R.id.message_body)).getText().toString();
+
+                    final String name;
+                    if(name_text.getText().toString().equals(""))
+                        name = "Anonymous";
+                    else
+                        name = ((TextView) findViewById(R.id.name_text)).getText().toString();
 
                     final String kId = String.valueOf(KacheMap.inKache.charAt(KacheMap.inKache.length() - 1));
 

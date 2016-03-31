@@ -23,13 +23,27 @@
 
         <EditText
             android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/name_text"
+            android:hint="Name (Optional)"
+            android:layout_below="@+id/send_title"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="15dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="100dp"
             android:inputType="textMultiLine"
             android:maxLength="140"
             android:ems="10"
             android:id="@+id/message_body"
             android:hint="Enter Message..."
-            android:layout_below="@+id/send_title"
+            android:layout_below="@+id/name_text"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_margin="15dp"
