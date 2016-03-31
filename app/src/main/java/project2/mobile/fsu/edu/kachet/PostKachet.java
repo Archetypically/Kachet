@@ -100,18 +100,24 @@ public class PostKachet extends AppCompatActivity {
                                 URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
                                 urlConnection = (HttpURLConnection) url.openConnection();
                                 urlConnection.setRequestMethod("POST");
-                                urlConnection.setRequestProperty("Content-Type", "image/jpeg");
                                 urlConnection.setDoOutput(true);
                                 urlConnection.setDoInput(true);
                                 urlConnection.connect();
-                                InputStream in = new FileInputStream(currentMediaUri.getPath());
-                                Log.i("URI", currentMediaUri.getPath());
                                 OutputStream out = urlConnection.getOutputStream();
-                                copy(in, out);
-                                OutputStreamWriter request = new OutputStreamWriter(out);
-                                request.write(parameters);
-                                request.flush();
-                                request.close();
+                                if (currentMediaUri != null) {
+                                    urlConnection.setRequestProperty("Content-Type", "image/jpeg");
+                                    InputStream in = new FileInputStream(currentMediaUri.getPath());
+                                    Log.i("URI", currentMediaUri.getPath());
+                                    copy(in, out);
+                                    out.flush();
+                                    out.close();
+                                }
+                                else {
+                                    OutputStreamWriter request = new OutputStreamWriter(out);
+                                    request.write(parameters);
+                                    request.flush();
+                                    request.close();
+                                }
                             }
                             catch (IOException ioe){
                                 ioe.printStackTrace();
