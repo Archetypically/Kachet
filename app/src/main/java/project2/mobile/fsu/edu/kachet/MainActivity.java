@@ -41,12 +41,9 @@ public class MainActivity extends TabActivity {
             @Override
             public void onTabChanged(String tabId) {
                 View currentView = getTabHost().getCurrentView();
-                if (getTabHost().getCurrentTab() > currentTab)
-                {
+                if (getTabHost().getCurrentTab() > currentTab) {
                     currentView.setAnimation(inFromRightAnimation());
-                }
-                else
-                {
+                } else {
                     currentView.setAnimation(outToRightAnimation());
                 }
 

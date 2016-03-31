@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
@@ -51,6 +50,7 @@ public class KacheFragment extends Fragment {
                 TextView dateText = (TextView) v.findViewById(R.id.date);
                 TextView msgText = (TextView) v.findViewById(R.id.message);
                 ImageView avView = (ImageView) v.findViewById(R.id.avatar);
+                ImageView picView = (ImageView) v.findViewById(R.id.picture);
 
                 String name = nameText.getText().toString();
                 String date = dateText.getText().toString();

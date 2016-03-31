@@ -462,11 +462,20 @@ public class KacheMap extends AppCompatActivity
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                             date = dateFormat.parse(ts);
                         }
+
+                        String img = null;
+                        try{
+                            img = tmp.getString("image");
+                        }
+                        catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                         kMsg = new KacheAdapter.KacheMessage(
                                 message,
                                 name,
                                 date,
-                                null,
+                                img,
                                 Character.getNumericValue(code.charAt(code.length() - 1)));
                         messages.add(kMsg);
                     }

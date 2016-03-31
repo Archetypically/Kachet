@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -104,7 +103,7 @@ public class PostKachet extends AppCompatActivity {
                                 urlConnection.setDoInput(true);
                                 urlConnection.connect();
                                 OutputStream out = urlConnection.getOutputStream();
-                                if (currentMediaUri != null) {
+/*                                if (currentMediaUri != null) {
                                     urlConnection.setRequestProperty("Content-Type", "image/jpeg");
                                     InputStream in = new FileInputStream(currentMediaUri.getPath());
                                     Log.i("URI", currentMediaUri.getPath());
@@ -112,12 +111,12 @@ public class PostKachet extends AppCompatActivity {
                                     out.flush();
                                     out.close();
                                 }
-                                else {
-                                    OutputStreamWriter request = new OutputStreamWriter(out);
-                                    request.write(parameters);
-                                    request.flush();
-                                    request.close();
-                                }
+                                else {*/
+                                OutputStreamWriter request = new OutputStreamWriter(out);
+                                request.write(parameters);
+                                request.flush();
+                                request.close();
+/*                                }*/
                             }
                             catch (IOException ioe){
                                 ioe.printStackTrace();

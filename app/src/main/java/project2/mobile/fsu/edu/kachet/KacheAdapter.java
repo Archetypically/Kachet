@@ -1,10 +1,7 @@
 package project2.mobile.fsu.edu.kachet;
 
-import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,7 +101,8 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         holder.mAvatarView.setTransitionName(av_t + pos);
 
         if(tmp.picture != null) {
-            holder.mPictureView.setImageResource(R.drawable.img_default);
+            holder.mPictureView.setVisibility(View.VISIBLE);
+            holder.mPictureView.setImageResource(R.mipmap.splash);
             holder.mPictureView.setTransitionName(pic_t + pos);
         }
         else
@@ -120,23 +118,8 @@ public class KacheAdapter extends RecyclerView.Adapter<KacheAdapter.ViewHolder> 
         });
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return mMessages.size();
-    }
-
-    private void initializeData() {
-        Date dummy = new Date();
-
-        mMessages = new ArrayList<>();
-        mMessages.add(
-                new KacheMessage("Cool!", "Evan", dummy, null, 1));
-        mMessages.add(
-                new KacheMessage("Wow!", "Tyler", dummy, "notnull", 1));
-        mMessages.add(
-                new KacheMessage("Amaz!", "BB", dummy, null, 1));
-        mMessages.add(
-                new KacheMessage("I wish to stay anonymous!", null, dummy, null, 1));
     }
 }
