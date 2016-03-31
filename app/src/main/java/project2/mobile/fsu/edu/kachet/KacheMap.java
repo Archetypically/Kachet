@@ -260,20 +260,36 @@ public class KacheMap extends AppCompatActivity
             gMap.setMyLocationEnabled(true);
         }
 
+        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
+
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(inKache != null) {
+                    if (inKache.equals(marker.getTitle())) {
+                        fab.show();
+                    }
+                }
+                return false;
+            }
+        });
+
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                if(inKache != null) {
-                    if (inKache.equals(marker.getTitle())) {
-                        showKachePopup();
-                    }
-                }
-                else {
+                if(!inKache.equalsIgnoreCase(marker.getTitle())){
                     CoordinatorLayout mCoordLayout = (CoordinatorLayout) findViewById(R.id.coordLayout);
                     Snackbar.make(mCoordLayout,
                             "You are not close enough to this kache!",
                             Snackbar.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        gMap.setOnInfoWindowCloseListener(new GoogleMap.OnInfoWindowCloseListener() {
+            @Override
+            public void onInfoWindowClose(Marker marker) {
+                if (fab.isShown())
+                    fab.hide();
             }
         });
         gMap.getUiSettings().setMapToolbarEnabled(false);
@@ -425,8 +441,6 @@ public class KacheMap extends AppCompatActivity
 
     public static void setInKache(final String code) {
         inKache = code;
-        fab.show();
-
         Thread thread = new Thread() {
             @Override
             public void run() {
