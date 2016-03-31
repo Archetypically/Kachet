@@ -129,6 +129,7 @@ public class PostKachet extends AppCompatActivity {
                         Snackbar.LENGTH_LONG).show();
 
                     message_text.getText().clear();
+                    name_text.getText().clear();
                     view_image.setImageResource(0);
                     view_image.setSaveEnabled(false);
                 }
@@ -138,6 +139,7 @@ public class PostKachet extends AppCompatActivity {
         reset.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                     message_text.getText().clear();
+                    name_text.getText().clear();
                     view_image.setImageResource(0);
                     view_image.setSaveEnabled(false);
             }
