@@ -75,7 +75,7 @@ public class KacheMap extends AppCompatActivity
     private LocationRequest mLocationRequest;
     private ArrayList<Geofence> mGeofenceList;
     private HashMap<LatLng, Marker> kacheList;
-    private static String inKache = null;
+    public static String inKache = null;
     protected PendingIntent mGeofencePendingIntent;
     private static FloatingActionButton fab;
     private FrameLayout mFrameLayout;
@@ -298,45 +298,6 @@ public class KacheMap extends AppCompatActivity
     //**************************************
     // Kaching Functions
     //**************************************
-
-    public void addToKache(KacheAdapter.KacheMessage kMsg){
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                HttpURLConnection urlConnection = null;
-                try {
-                    String response = "null";
-                    String parameters = "kache_id=2&message=Testing!";
-                    URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("POST");
-                    urlConnection.setDoOutput(true);
-                    urlConnection.setDoInput(true);
-                    urlConnection.connect();
-                    OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
-                    request.write(parameters);
-                    request.flush();
-                    request.close();
-                    String line = "";
-                    InputStream in = urlConnection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    while ((line = reader.readLine()) != null) {
-                        response += line + "\n";
-                    }
-                    in.close();
-                    reader.close();
-                }
-                catch (IOException ioe){
-                    ioe.printStackTrace();
-                }
-                finally {
-                    if(urlConnection != null)
-                        urlConnection.disconnect();
-                }
-            }
-        };
-        thread.start();
-    }
 
     private Marker addKachetoMap(LatLng coords){
         return gMap.addMarker(new MarkerOptions()

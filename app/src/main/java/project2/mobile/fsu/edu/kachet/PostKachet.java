@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -56,19 +64,71 @@ public class PostKachet extends AppCompatActivity {
 
         submit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                CoordinatorLayout mCoord = (CoordinatorLayout) findViewById(R.id.coord);
                 if(message_text.getText().toString().equals("") && !view_image.isSaveEnabled()){
-                    Toast.makeText(getApplicationContext(), "ERROR: Post is Blank", Toast.LENGTH_SHORT).show();
-                }else{
+                    Snackbar.make(mCoord,
+                            "Your post cannot be blank.",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                else if (KacheMap.inKache == null) {
+                    Snackbar.make(mCoord,
+                            "You are not within a kache!",
+                            Snackbar.LENGTH_LONG).show();
+                }
+                else{
+                    final String msg =
+                            ((TextView) v.findViewById(R.id.message_body)).getText().toString();
 
-                    //send to server here
-                    Toast.makeText(getApplicationContext(), "Kache Posted", Toast.LENGTH_SHORT).show();
+                    final String name =
+                            ((TextView) v.findViewById(R.id.name_text)).getText().toString();
+
+                    final String kId = String.valueOf(KacheMap.inKache.charAt(KacheMap.inKache.length() - 1));
+
+                    Thread thread = new Thread() {
+                        @Override
+                        public void run() {
+                            HttpURLConnection urlConnection = null;
+                            try {
+                                String response = "";
+                                String parameters = "kache_id="+kId+"&message="+msg+"&name="+name;
+                                URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
+                                urlConnection = (HttpURLConnection) url.openConnection();
+                                urlConnection.setRequestMethod("POST");
+                                urlConnection.setDoOutput(true);
+                                urlConnection.setDoInput(true);
+                                urlConnection.connect();
+                                OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
+                                request.write(parameters);
+                                request.flush();
+                                request.close();
+                                String line = "";
+                                InputStream in = urlConnection.getInputStream();
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                                while ((line = reader.readLine()) != null) {
+                                    response += line + "\n";
+                                }
+                                in.close();
+                                reader.close();
+                            }
+                            catch (IOException ioe){
+                                ioe.printStackTrace();
+                            }
+                            finally {
+                                if(urlConnection != null)
+                                    urlConnection.disconnect();
+                            }
+                        }
+                    };
+                    thread.start();
+
+                    Snackbar.make(mCoord, "You have posted to Kache " + kId,
+                        Snackbar.LENGTH_LONG).show();
 
                     message_text.getText().clear();
                     view_image.setImageResource(0);
                     view_image.setSaveEnabled(false);
                 }
             }
-
         });
 
         reset.setOnClickListener(new View.OnClickListener() {

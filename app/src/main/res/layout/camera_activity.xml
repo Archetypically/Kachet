@@ -1,121 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white">
-
+    android:id="@+id/coord">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/title_bar">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/icon"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_centerVertical="true" />
+        android:layout_height="match_parent"
+        android:background="#000000">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Add to Kache"
+            android:text="Send a Kache"
             android:id="@+id/send_title"
             android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:layout_margin="15dp"
-            android:textColor="@color/colorPrimaryText"
-            android:textStyle="bold"
-            android:textSize="24sp"
-            android:layout_toRightOf="@+id/icon"
-            android:layout_alignTop="@+id/icon"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:layout_centerVertical="true" />
-    </RelativeLayout>
+            android:textColor="#FFFFFF"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_message"
-        android:layout_below="@+id/title_bar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:inputType="textMultiLine"
             android:maxLength="140"
             android:ems="10"
             android:id="@+id/message_body"
             android:hint="Enter Message..."
+            android:layout_below="@+id/send_title"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_margin="15dp"
             android:background="#FFFFFF"
-            android:textColor="@color/colorSecondaryText" />
-    </android.support.design.widget.TextInputLayout>
+            android:textColor="#000000"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/colorDivider"
-        android:layout_below="@+id/input_message"
-        android:id="@+id/divider"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:id="@+id/view_img"
+            android:layout_margin="15dp"
+            android:saveEnabled="false"
+            android:layout_below="@+id/message_body" />
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:id="@+id/view_img"
-        android:saveEnabled="false"
-        android:layout_below="@+id/divider" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/checkmark_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/checkmark_icon"
+            android:layout_margin="16dp"
+            android:elevation="6dp"
+            app:layout_anchor="@id/view_img"
+            app:layout_anchorGravity="bottom|right|end"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/checkmark_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/checkmark_icon"
-        android:layout_margin="16dp"
-        android:elevation="6dp"
-        app:layout_anchor="@id/view_img"
-        app:layout_anchorGravity="bottom|right|end"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:visibility="gone" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/x_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/x_icon"
+            android:layout_margin="16dp"
+            android:elevation="6dp"
+            app:layout_anchor="@id/view_img"
+            app:layout_anchorGravity="bottom|right|end"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/checkmark_button"
+            android:layout_toStartOf="@+id/checkmark_button" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/x_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/x_icon"
-        android:layout_margin="16dp"
-        android:elevation="6dp"
-        app:layout_anchor="@id/view_img"
-        app:layout_anchorGravity="bottom|right|end"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/checkmark_button"
-        android:layout_toStartOf="@+id/checkmark_button"
-        android:visibility="gone" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/take_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:src="@drawable/camera_icon"
+            android:elevation="6dp"
+            app:layout_anchor="@id/view_img"
+            app:layout_anchorGravity="bottom|left|start"
+            android:layout_alignTop="@+id/checkmark_button"
+            android:layout_alignLeft="@+id/message_body"
+            android:layout_alignStart="@+id/message_body" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/take_picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:src="@drawable/camera_icon"
-        android:elevation="6dp"
-        app:layout_anchor="@id/view_img"
-        app:layout_anchorGravity="bottom|right|end" />
-
-</RelativeLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
