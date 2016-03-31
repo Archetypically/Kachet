@@ -18,7 +18,6 @@ public class KacheFencingService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i(TAG, "onHandleIntent");
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
             Log.e(TAG, "FencingEvent has error: " + geofencingEvent.getErrorCode());
@@ -29,15 +28,15 @@ public class KacheFencingService extends IntentService {
 
         List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
-            if(!geofenceList.isEmpty())
+            if(!geofenceList.isEmpty()) {
                 KacheMap.setInKache(geofenceList.get(0).getRequestId());
+            }
         }
         else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT){
             if(!geofenceList.isEmpty())
                 KacheMap.setOutKache(geofenceList.get(0).getRequestId());
         }
         else {
-            // Log the error.
             Log.e(TAG, "The Geofence transition has errored.");
         }
     }
