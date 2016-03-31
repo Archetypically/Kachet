@@ -16,13 +16,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -79,6 +78,7 @@ public class PostKachet extends AppCompatActivity {
                 }
                 else{
 
+
                     final String msg =
                             ((TextView) findViewById(R.id.message_body)).getText().toString();
 
@@ -100,28 +100,26 @@ public class PostKachet extends AppCompatActivity {
                                 URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
                                 urlConnection = (HttpURLConnection) url.openConnection();
                                 urlConnection.setRequestMethod("POST");
+                                urlConnection.setRequestProperty("Content-Type", "image/jpeg");
                                 urlConnection.setDoOutput(true);
                                 urlConnection.setDoInput(true);
                                 urlConnection.connect();
-                                OutputStreamWriter request = new OutputStreamWriter(urlConnection.getOutputStream());
+                                InputStream in = new FileInputStream(currentMediaUri.getPath());
+                                Log.i("URI", currentMediaUri.getPath());
+                                OutputStream out = urlConnection.getOutputStream();
+                                copy(in, out);
+                                OutputStreamWriter request = new OutputStreamWriter(out);
                                 request.write(parameters);
                                 request.flush();
                                 request.close();
-                                String line = "";
-                                InputStream in = urlConnection.getInputStream();
-                                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                                while ((line = reader.readLine()) != null) {
-                                    response += line + "\n";
-                                }
-                                in.close();
-                                reader.close();
                             }
                             catch (IOException ioe){
                                 ioe.printStackTrace();
                             }
                             finally {
-                                if(urlConnection != null)
+                                if(urlConnection != null) {
                                     urlConnection.disconnect();
+                                }
                             }
                         }
                     };
@@ -146,6 +144,18 @@ public class PostKachet extends AppCompatActivity {
 
         });
 
+    }
+
+    protected static long copy(InputStream input, OutputStream output)
+            throws IOException {
+        byte[] buffer = new byte[12288]; // 12K
+        long count = 0L;
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 
     /*
