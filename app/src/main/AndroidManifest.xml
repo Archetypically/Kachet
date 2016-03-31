@@ -17,9 +17,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".KacheMap"></activity>
-        <activity android:name=".Camera"></activity>
-        <activity android:name=".Send_Media"></activity>
-        <activity android:name=".Send_Message"></activity>
+        <activity android:name=".PostKachet"></activity>
 
         <!-- API Key needed to access google play services -->
         <meta-data

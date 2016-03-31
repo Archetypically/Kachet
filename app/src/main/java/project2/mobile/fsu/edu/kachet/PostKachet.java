@@ -7,15 +7,20 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Camera extends AppCompatActivity {
+public class PostKachet extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
 
@@ -26,18 +31,73 @@ public class Camera extends AppCompatActivity {
     private static final String MEDIA_FOLDER_NAME = "Kachet";
     private Uri currentMediaUri;
 
+    EditText message_text;
     ImageView view_image;
+    FloatingActionButton camera, submit, reset;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_activity);
 
+        message_text = (EditText) findViewById(R.id.message_body);
         view_image = (ImageView) findViewById(R.id.view_img);
+        submit = (FloatingActionButton) findViewById(R.id.checkmark_button);
+        camera = (FloatingActionButton) findViewById(R.id.take_picture);
+        reset = (FloatingActionButton) findViewById(R.id.x_button);
 
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+        camera.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                captureImage();
+                view_image.setSaveEnabled(true);
+            }
+
+        });
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(message_text.getText().toString().equals("") && !view_image.isSaveEnabled()){
+                    Toast.makeText(getApplicationContext(), "ERROR: Post is Blank", Toast.LENGTH_SHORT).show();
+                }else{
+
+                    //send to server here
+                    Toast.makeText(getApplicationContext(), "Kache Posted", Toast.LENGTH_SHORT).show();
+
+                    message_text.getText().clear();
+                    view_image.setImageResource(0);
+                    view_image.setSaveEnabled(false);
+                }
+            }
+
+        });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                    message_text.getText().clear();
+                    view_image.setImageResource(0);
+                    view_image.setSaveEnabled(false);
+            }
+
+        });
+
+    }
+
+    /*
+ * Uses an image capture intent to obtain an image from the device's camera
+ */
+    void captureImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // Create a file to save the image
+        currentMediaUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        if (currentMediaUri == null) {
+            Log.e(TAG, "CaptureImage: could not create file URI");
+            return;
+        }
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, currentMediaUri);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
 
@@ -46,10 +106,7 @@ public class Camera extends AppCompatActivity {
         // React to captured image
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                view_image.setImageBitmap(imageBitmap);
-                view_image.setImageDrawable(getDrawable(R.drawable.splash));
+                setPic();
 
                 //Log.i(TAG, "onActivityResult: Image saved to: " + currentMediaUri.getPath());
 
@@ -131,28 +188,28 @@ public class Camera extends AppCompatActivity {
         return mediaFile;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+    private void setPic() {
+        // Get the dimensions of the View
+        int targetW = view_image.getWidth();
+        int targetH = view_image.getHeight();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(currentMediaUri.getPath(), bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(currentMediaUri.getPath(), bmOptions);
+        view_image.setImageBitmap(bitmap);
     }
 }

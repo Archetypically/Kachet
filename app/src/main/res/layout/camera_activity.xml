@@ -2,14 +2,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#000000">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Send a Kach!!"
+        android:id="@+id/send_title"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="15dp"
+        android:textColor="#FFFFFF"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:inputType="textMultiLine"
+        android:maxLength="140"
+        android:ems="10"
+        android:id="@+id/message_body"
+        android:hint="Enter Message..."
+        android:layout_below="@+id/send_title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="15dp"
+        android:background="#FFFFFF"
+        android:textColor="#000000"/>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
         android:id="@+id/view_img"
-        android:src="#990"/>
+        android:layout_margin="15dp"
+        android:saveEnabled="false"
+        android:layout_below="@+id/message_body" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/checkmark_button"
@@ -24,5 +53,32 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/x_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/x_icon"
+        android:layout_margin="16dp"
+        android:elevation="6dp"
+        app:layout_anchor="@id/view_img"
+        app:layout_anchorGravity="bottom|right|end"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/checkmark_button"
+        android:layout_toStartOf="@+id/checkmark_button" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/take_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:src="@drawable/camera_icon"
+        android:elevation="6dp"
+        app:layout_anchor="@id/view_img"
+        app:layout_anchorGravity="bottom|left|start"
+        android:layout_alignTop="@+id/checkmark_button"
+        android:layout_alignLeft="@+id/message_body"
+        android:layout_alignStart="@+id/message_body" />
 
 </RelativeLayout>
