@@ -12,6 +12,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,8 +22,6 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,9 +39,9 @@ public class PostKachet extends AppCompatActivity {
     private static final String MEDIA_FOLDER_NAME = "Kachet";
     private Uri currentMediaUri;
 
-    EditText message_text, name_text;
-    ImageView view_image;
-    FloatingActionButton camera, submit, reset;
+    private EditText message_text, name_text;
+    private ImageView view_image;
+    private FloatingActionButton camera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,20 +51,26 @@ public class PostKachet extends AppCompatActivity {
         message_text = (EditText) findViewById(R.id.message_body);
         view_image = (ImageView) findViewById(R.id.view_img);
         name_text = (EditText) findViewById(R.id.name_text);
-        submit = (FloatingActionButton) findViewById(R.id.checkmark_button);
         camera = (FloatingActionButton) findViewById(R.id.take_picture);
-        reset = (FloatingActionButton) findViewById(R.id.x_button);
 
         camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 captureImage();
                 view_image.setSaveEnabled(true);
             }
-
         });
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        view_image.setImageResource(R.drawable.img_default);
+
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setTitle("Kache Message");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.submit:
                 CoordinatorLayout mCoord = (CoordinatorLayout) findViewById(R.id.coord);
                 if(message_text.getText().toString().equals("") && !view_image.isSaveEnabled()){
                     Snackbar.make(mCoord,
@@ -79,44 +86,40 @@ public class PostKachet extends AppCompatActivity {
 
 
                     final String msg =
-                            ((TextView) findViewById(R.id.message_body)).getText().toString();
+                            ((TextView) findViewById(R.id.message_body))
+                                    .getText()
+                                    .toString();
 
-                    final String name;
-                    if(name_text.getText().toString().equals(""))
-                        name = "Anonymous";
-                    else
-                        name = ((TextView) findViewById(R.id.name_text)).getText().toString();
+                    final String name =
+                            ((TextView) findViewById(R.id.name_text))
+                                    .getText()
+                                    .toString();
 
-                    final String kId = String.valueOf(KacheMap.inKache.charAt(KacheMap.inKache.length() - 1));
+                    final String kId =
+                            String.valueOf(
+                                    KacheMap.inKache.charAt(KacheMap.inKache.length() - 1)
+                            );
 
                     Thread thread = new Thread() {
                         @Override
                         public void run() {
                             HttpURLConnection urlConnection = null;
                             try {
-                                String response = "";
                                 String parameters = "kache_id="+kId+"&message="+msg+"&name="+name;
-                                URL url = new URL("http://www.tylerhunnefeld.com/android/db_addKacheData.php");
+                                URL url = new URL(
+                                        "http://www.tylerhunnefeld.com/android/db_addKacheData.php"
+                                );
                                 urlConnection = (HttpURLConnection) url.openConnection();
                                 urlConnection.setRequestMethod("POST");
                                 urlConnection.setDoOutput(true);
                                 urlConnection.setDoInput(true);
                                 urlConnection.connect();
-                                OutputStream out = urlConnection.getOutputStream();
-/*                                if (currentMediaUri != null) {
-                                    urlConnection.setRequestProperty("Content-Type", "image/jpeg");
-                                    InputStream in = new FileInputStream(currentMediaUri.getPath());
-                                    Log.i("URI", currentMediaUri.getPath());
-                                    copy(in, out);
-                                    out.flush();
-                                    out.close();
-                                }
-                                else {*/
-                                OutputStreamWriter request = new OutputStreamWriter(out);
+                                OutputStreamWriter request =
+                                        new OutputStreamWriter(urlConnection.getOutputStream());
                                 request.write(parameters);
                                 request.flush();
                                 request.close();
-/*                                }*/
+                                urlConnection.getInputStream();
                             }
                             catch (IOException ioe){
                                 ioe.printStackTrace();
@@ -131,38 +134,30 @@ public class PostKachet extends AppCompatActivity {
                     thread.start();
 
                     Snackbar.make(mCoord, "You have posted to Kache " + kId,
-                        Snackbar.LENGTH_LONG).show();
+                            Snackbar.LENGTH_LONG).show();
 
                     message_text.getText().clear();
                     name_text.getText().clear();
                     view_image.setImageResource(0);
                     view_image.setSaveEnabled(false);
                 }
-            }
-        });
-
-        reset.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                    message_text.getText().clear();
-                    name_text.getText().clear();
-                    view_image.setImageResource(0);
-                    view_image.setSaveEnabled(false);
-            }
-
-        });
-
+                return true;
+            case R.id.cancel:
+                message_text.getText().clear();
+                name_text.getText().clear();
+                view_image.setImageResource(0);
+                view_image.setSaveEnabled(false);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
-    protected static long copy(InputStream input, OutputStream output)
-            throws IOException {
-        byte[] buffer = new byte[12288]; // 12K
-        long count = 0L;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-            output.write(buffer, 0, n);
-            count += n;
-        }
-        return count;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.kache_menu, menu);
+        return true;
     }
 
     /*
@@ -190,17 +185,12 @@ public class PostKachet extends AppCompatActivity {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 setPic();
-
-                //Log.i(TAG, "onActivityResult: Image saved to: " + currentMediaUri.getPath());
-
-                // TODO: Do something useful with saved image, located at currentMediaUri
             }
             else if (resultCode == RESULT_CANCELED) {
                 Log.i(TAG, "onActivityResult: User cancelled the image capture");
             }
             else {
                 // Image capture failed, advise user
-                // TODO: Figure out how best to advise user
             }
         }
 
@@ -208,15 +198,12 @@ public class PostKachet extends AppCompatActivity {
         if (requestCode == CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Log.i(TAG, "onActivityResult: Video saved to: " + data.getData());
-
-                // TODO: Do something useful with saved video, located at currentMediaUri
             }
             else if (resultCode == RESULT_CANCELED) {
                 Log.i(TAG, "onActivityResult: User cancelled the video capture");
             }
             else {
                 // Video capture failed, advise user
-                // TODO: Figure out how best to advise user
             }
         }
     }

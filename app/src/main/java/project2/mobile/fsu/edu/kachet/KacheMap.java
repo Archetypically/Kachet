@@ -4,10 +4,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -151,13 +148,17 @@ public class KacheMap extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                FragmentManager fm = getSupportFragmentManager();
-                if (fm.getBackStackEntryCount() > 0) {
-                    fm.popBackStack();
-                }
-                if(fm.getBackStackEntryCount() == 1 && getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle(R.string.main_title);
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                if (getSupportActionBar() != null) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    switch (fm.getBackStackEntryCount()) {
+                        case 1:
+                            getSupportActionBar().setTitle(R.string.main_title);
+                            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                            break;
+                        default:
+                            fm.popBackStack();
+                            break;
+                    }
                 }
                 return true;
             default:
@@ -214,7 +215,7 @@ public class KacheMap extends AppCompatActivity
                             coords.longitude,
                             fenceRadius)
                     .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                    .setLoiteringDelay(5000)
+                    .setLoiteringDelay(1000)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL
                             | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build());
@@ -319,45 +320,9 @@ public class KacheMap extends AppCompatActivity
         transaction.add(android.R.id.content, mKacheFragment)
                 .addToBackStack(null).commit();
         if(getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(null);
+            getSupportActionBar().setTitle(inKache);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    //**************************************
-    // Helper Functions
-    //**************************************
-
-    private void addMarkerFromCoordinates(double Lat, double Long, final String markerTitle) {
-        LatLng newLocation = new LatLng(Lat, Long);
-        Marker newMarker = gMap.addMarker(new MarkerOptions()
-                .position(newLocation)
-                .title(markerTitle));
-    }
-
-    public Bitmap resizeMapIcons(String iconName, int width, int height) {
-        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "mipmap", getPackageName()));
-        //Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
-        return getResizedBitmap(imageBitmap, height, width);
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // create a matrix for the manipulation
-        Matrix matrix = new Matrix();
-        // resize the bit map
-        matrix.postScale(scaleWidth, scaleHeight);
-        // recreate the new Bitmap
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-        return resizedBitmap;
-    }
-
-    public void setActionBarTitle(String title){
-        if(getSupportActionBar() != null)
-            getSupportActionBar().setTitle(title);
     }
 
     //**************************************
@@ -365,9 +330,7 @@ public class KacheMap extends AppCompatActivity
     //**************************************
 
     @Override
-    public void onLocationChanged(Location location) {
-        // TODO: UPDATE CURRLOC IF NEEDED
-    }
+    public void onLocationChanged(Location location) { }
 
     //**************************************
     // Geofencing Functions
@@ -463,19 +426,11 @@ public class KacheMap extends AppCompatActivity
                             date = dateFormat.parse(ts);
                         }
 
-                        String img = null;
-                        try{
-                            img = tmp.getString("image");
-                        }
-                        catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
                         kMsg = new KacheAdapter.KacheMessage(
                                 message,
                                 name,
                                 date,
-                                img,
+                                null,
                                 Character.getNumericValue(code.charAt(code.length() - 1)));
                         messages.add(kMsg);
                     }
@@ -508,5 +463,9 @@ public class KacheMap extends AppCompatActivity
                         .fillColor(Color.parseColor("#66FCE4EC"))
                         .strokeColor(Color.parseColor("#99EC407A"))
         );
+    }
+
+    public static String getKacheId(){
+        return String.valueOf(inKache.charAt(inKache.length() - 1));
     }
 }

@@ -7,4 +7,7 @@
     <string name="anon">Anonymous</string>
 
     <string name="main_title">Kachet</string>
+
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
 </resources>

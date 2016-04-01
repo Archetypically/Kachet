@@ -82,18 +82,11 @@ public class FocusFragment extends DialogFragment {
             dateView.setText(this.date);
             dateView.setTransitionName(dateTId);
             avatarView.setTransitionName(avatarTId);
-            if(this.pic != null) {
-                picView.setImageResource(R.mipmap.splash);
-                picView.setVisibility(View.VISIBLE);
-                picView.setTransitionName(picTId);
-            }
-            else
-                picView.setVisibility(View.GONE);
+            picView.setVisibility(View.GONE);
         }
         catch (NullPointerException npe){
             npe.printStackTrace();
         }
-
 
         return v;
     }
@@ -112,9 +105,5 @@ public class FocusFragment extends DialogFragment {
 
     public void setMsgTId(String id){
         this.msgTId = id;
-    }
-
-    public void setPicTId(String id){
-        this.picTId = id;
     }
 }

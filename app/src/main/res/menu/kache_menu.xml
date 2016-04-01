@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:kachet="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/submit"
+        android:icon="@drawable/checkmark_icon"
+        android:title="@string/submit"
+        kachet:showAsAction="always" />
+    <item android:id="@+id/cancel"
+        android:icon="@drawable/x_icon"
+        android:title="@string/cancel"
+        kachet:showAsAction="always"/>
+</menu>

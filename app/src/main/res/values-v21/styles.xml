@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
         <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
                 <!-- Customize your theme here. -->
                 <item name="colorPrimary">@color/colorPrimary</item>
                 <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
                 <item name="colorAccent">@color/colorAccent</item>
                 <item name="android:windowContentTransitions">true</item>
+        </style>
+
+        <style name="TextLabel" parent="TextAppearance.AppCompat">
+                <!-- Hint color and label color in FALSE state -->
+                <item name="android:textColorHint">@color/colorSecondaryText</item>
+                <item name="android:textSize">14sp</item>
+                <item name="android:backgroundTint">@color/colorPrimary</item>
+                <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+                <item name="colorAccent">@color/colorPrimaryText</item>
+                <item name="colorControlNormal">@color/colorPrimary</item>
+                <item name="colorControlActivated">@color/colorPrimaryDark</item>
         </style>
 </resources>

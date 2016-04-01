@@ -37,7 +37,9 @@ public class KacheFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_kache, container, false);
+
         mRecyclerView = (RecyclerView) v.findViewById(R.id.kache_recycler);
+
         LinearLayoutManager mRecyclerManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mRecyclerManager);
         mRecyclerView.setHasFixedSize(true);
@@ -50,7 +52,6 @@ public class KacheFragment extends Fragment {
                 TextView dateText = (TextView) v.findViewById(R.id.date);
                 TextView msgText = (TextView) v.findViewById(R.id.message);
                 ImageView avView = (ImageView) v.findViewById(R.id.avatar);
-                ImageView picView = (ImageView) v.findViewById(R.id.picture);
 
                 String name = nameText.getText().toString();
                 String date = dateText.getText().toString();

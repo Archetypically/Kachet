@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="project2.mobile.fsu.edu.kachet.FocusFragment"
-    android:background="@color/white">
+    tools:context="project2.mobile.fsu.edu.kachet.FocusFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,7 +12,8 @@
         android:paddingLeft="24dp"
         android:paddingTop="24dp"
         android:paddingRight="24dp"
-        android:paddingBottom="20dp">
+        android:paddingBottom="20dp"
+        android:background="@color/colorAccent">
 
         <ImageView
             android:layout_width="40dp"
@@ -32,7 +32,8 @@
             android:textIsSelectable="false"
             android:layout_toRightOf="@+id/imageView"
             android:text="@string/anon"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:textColor="@color/colorPrimaryText"/>
 
     </RelativeLayout>
 

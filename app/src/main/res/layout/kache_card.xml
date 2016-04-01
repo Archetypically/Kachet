@@ -6,7 +6,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="6dp"
+    card_view:cardElevation="4dp"
     android:layout_margin="5dp"
     android:padding="8dp"
     android:clickable="true"
@@ -21,7 +21,9 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:layout_alignParentEnd="false"
-            android:id="@+id/titleArea">
+            android:id="@+id/titleArea"
+            android:background="@color/colorAccent"
+            android:elevation="2dp">
 
             <ImageView
                 android:layout_width="40dp"
@@ -35,6 +37,7 @@
                 android:id="@+id/name"
                 android:textSize="24sp"
                 android:textStyle="bold"
+                android:textColor="@color/white"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:textIsSelectable="false"
@@ -51,7 +54,8 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:layout_alignLeft="@+id/name"
-                android:layout_below="@+id/name" />
+                android:layout_below="@+id/name"
+                android:textColor="@color/white"/>
         </RelativeLayout>
 
         <ImageView
